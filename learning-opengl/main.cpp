@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-const char* vertexShaderSource = "#version 330 core\n"
+const char* vertexShaderSource1 = "#version 330 core\n"
 	"layout(location = 0) in vec3 aPos; \n"
 	"layout(location = 1) in vec2 aUV;\n"
 	"out vec2 UV;"
@@ -14,6 +14,18 @@ const char* vertexShaderSource = "#version 330 core\n"
 	"	UV = aUV;\n"
 	"}\n";
 
+
+const char* vertexShaderSource2 =  "#version 330 core\n"
+	"layout(location = 0) in vec3 aPos; \n"
+	"layout(location = 1) in vec2 aUV;\n"
+	"uniform float time;\n"
+	"out vec2 UV;"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"	gl_Position = vec4(aPos.x+mod(time,1.0), aPos.y, aPos.z, 1.0);\n"
+	"	UV = aUV;\n"
+	"}\n";
 
 const char* fragmentShaderSource = "#version 330 core\n"
 "in vec2 UV;\n"
@@ -92,24 +104,34 @@ int main() {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 
-	float vertices[] = {
-		0.5f, 0.5f, 0.0f,1.0f,1.0f,
-		0.5f, -0.5f, 0.0f,1.0f,0.0f,
-		-0.5f, -0.5f, 0.0f,0.0f,0.0f,
-		-0.5f, 0.5f, 0.0f,0.0f,1.0f,
+	float vertices1[] = {
+		-0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+		-0.0f, -0.5f, 0.0f, 0.0f, 0.0f,
+		-0.25f, 0.5f, 0.0f, 0.0f, 0.0f,
 	};
 
-	int indices[] = {
-		0,1,3,
-		1,2,3
+	float vertices2[] = {
+		0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+		0.0f, -0.5f, 0.0f, 0.0f, 0.0f,
+		0.25f, 0.5f, 0.0f, 0.0f, 0.0f,
 	};
 
+	//int indices[] = {
+	//	0,1,2,
+	//	3,4,5
+	//};
 
 
-	GLuint vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
+
+	GLuint vertexShader1;
+	vertexShader1 = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader1, 1, &vertexShaderSource1, NULL);
+	glCompileShader(vertexShader1);
+
+	GLuint vertexShader2;
+	vertexShader2 = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader2, 1, &vertexShaderSource2, NULL);
+	glCompileShader(vertexShader2);
 
 
 	GLuint fragmentShader;
@@ -117,34 +139,37 @@ int main() {
 	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
 	glCompileShader(fragmentShader);
 
-	checkShaderCompiled(vertexShader);
+	checkShaderCompiled(vertexShader1);
+	checkShaderCompiled(vertexShader2);
 	checkShaderCompiled(fragmentShader);
 
-	GLuint shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
+	GLuint shaderProgram1 = glCreateProgram();
+	glAttachShader(shaderProgram1, vertexShader1);
+	glAttachShader(shaderProgram1, fragmentShader);
+	glLinkProgram(shaderProgram1);
 
-	checkProgramLinked(shaderProgram);
+	GLuint shaderProgram2 = glCreateProgram();
+	glAttachShader(shaderProgram2, vertexShader2);
+	glAttachShader(shaderProgram2, fragmentShader);
+	glLinkProgram(shaderProgram2);
+
+	checkProgramLinked(shaderProgram1);
+	checkProgramLinked(shaderProgram2);
 	
-	glDeleteShader(vertexShader);
+	glDeleteShader(vertexShader1);
+	glDeleteShader(vertexShader2);
 	glDeleteShader(fragmentShader);
 
 
 
-	GLuint VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+	GLuint VAO1;
+	glGenVertexArrays(1, &VAO1);
+	glBindVertexArray(VAO1);
 
-	GLuint VBO;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	GLuint EBO;
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	GLuint VBO1;
+	glGenBuffers(1, &VBO1);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO1);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -152,7 +177,29 @@ int main() {
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
+	GLuint VAO2;
+	glGenVertexArrays(1, &VAO2);
+	glBindVertexArray(VAO2);
 
+	GLuint VBO2;
+	glGenBuffers(1, &VBO2);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	//GLuint EBO;
+	//glGenBuffers(1, &EBO);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	GLint timeLocation = glGetUniformLocation(shaderProgram2, "time");
+
+	float time = 0.0f;
 
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
@@ -160,9 +207,15 @@ int main() {
 		glClearColor(0.1, 0.6, 0.2, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glUseProgram(shaderProgram);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glUseProgram(shaderProgram1);
+		glBindVertexArray(VAO1);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		glUseProgram(shaderProgram2);
+		glBindVertexArray(VAO2);
+		time += 0.0002f;
+		glUniform1f(timeLocation, time);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
