@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "Shader.h"
+#include "stb_image.h"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -46,39 +47,70 @@ int main() {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 
-	float vertices1[] = {
-		-0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-		-0.0f, -0.5f, 0.0f, 0.0f, 0.0f,
-		-0.25f, 0.5f, 0.0f, 0.0f, 0.0f,
+	float vertices[] = {
+		0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+		0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+	   -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+	   -0.5f,  0.5f, 0.0f, 0.0f, 1.0f
 	};
-
-	float vertices2[] = {
-		0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-		0.0f, -0.5f, 0.0f, 0.0f, 0.0f,
-		0.25f, 0.5f, 0.0f, 0.0f, 0.0f,
+	int indices[] = {
+		0,1,3,
+		1,2,3
 	};
-
-	//int indices[] = {
-	//	0,1,2,
-	//	3,4,5
-	//};
 
 	Shader shader("./defaultVertex.glsl", "./defaultFragment.glsl");
 
-	GLuint VAO1;
-	glGenVertexArrays(1, &VAO1);
-	glBindVertexArray(VAO1);
 
-	GLuint VBO1;
-	glGenBuffers(1, &VBO1);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO1);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);
+	GLuint VAO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+	
+	GLuint VBO;
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	GLuint EBO;
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)(3*sizeof(float)));
 	glEnableVertexAttribArray(1);
+
+	int width, height, nrChannels;
+	unsigned char* imageData = stbi_load("./texture.png", &width, &height, &nrChannels, 0);
+
+	GLuint texture1;
+	glGenTextures(1, &texture1);
+	glBindTexture(GL_TEXTURE_2D, texture1);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	stbi_image_free(imageData);
+	
+
+	imageData = stbi_load("./container.jpg", &width, &height, &nrChannels, 0);
+	GLuint texture2;
+	glGenTextures(1, &texture2);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(imageData);
+
+	shader.Use();
+	shader.SetInt("myTexture", 0);
+	shader.SetInt("otherTexture", 1);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, texture2);
 
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
@@ -86,10 +118,11 @@ int main() {
 		glClearColor(0.1, 0.6, 0.2, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glBindVertexArray(VAO1);
 		shader.Use();
 		shader.SetFloat("time", glfwGetTime());
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		//shader.SetInt("myTexture", texture);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
