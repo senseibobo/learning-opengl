@@ -52,11 +52,12 @@ int main() {
 
 
 	float vertices[] = {
-		0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-		0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-	   -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-	   -0.5f,  0.5f, 0.0f, 0.0f, 1.0f
+		0.5f,  0.5f, 0.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+	   -0.5f, -0.5f, 0.0f, 1.0f, 1.0f,
+	   -0.5f,  0.5f, 0.0f, 1.0f, 0.0f
 	};
+
 	int indices[] = {
 		0,1,3,
 		1,2,3
@@ -96,25 +97,45 @@ int main() {
 
 
 
+	// projection
+	glm::mat4 projection = glm::perspective(glm::radians(60.0f),800.0f/600.0f, 0.01f, 100.0f);
+
+
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
 
 		glClearColor(0.1, 0.6, 0.2, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		shader.Use();
-		shader.SetFloat("time", glfwGetTime());
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, -5.0f);
+		glm::vec3 cameraRotation = glm::vec3(cos(glfwGetTime()*5.0f)/3.0f, 0.0f, 0.0f);
 
-		glm::vec4 vec(1.0, 0.0, 0.0, 1.0);
-		glm::mat4 transform = glm::mat4(1.0);
+		// camera view transform
+		glm::mat4 view = glm::mat4(1.0f);
+		view = glm::rotate(view, -cameraRotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+		view = glm::rotate(view, -cameraRotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+		view = glm::rotate(view, -cameraRotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::translate(view, cameraPosition);
+		shader.Use();
+		//shader.SetFloat("time", glfwGetTime());
+		shader.SetMat4("view", view);
+		shader.SetMat4("projection", projection);
+
+		glm::mat4 transform = glm::mat4(1.0f);
 		transform = glm::translate(transform, glm::vec3(-0.5f, -0.2f, 0.0f));
 		transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 		transform = glm::scale(transform, glm::vec3(2.0f, 0.5f, 1.0f));
-
-		shader.SetMat4("transform", transform);
-		//shader.SetInt("myTexture", texture);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		shader.SetMat4("model", transform);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		glm::mat4 transform2 = glm::mat4(1.0f);
+		transform2 = glm::scale(transform2, glm::vec3(sin(glfwGetTime()), (cos(glfwGetTime())+3.0f)/4.0f, 1.0f));
+		transform2 = glm::translate(transform2, glm::vec3(0.5f, 0.0f, 1.0f));
+		shader.SetMat4("model", transform2);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
