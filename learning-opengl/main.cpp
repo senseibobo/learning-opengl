@@ -1,5 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include "Shader.h"
 #include "Texture2D.h"
@@ -91,6 +94,8 @@ int main() {
 	shader.SetTexture("myTexture", texture1.ID, 0);
 	shader.SetTexture("otherTexture", texture2.ID, 1);
 
+
+
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
 
@@ -99,6 +104,14 @@ int main() {
 
 		shader.Use();
 		shader.SetFloat("time", glfwGetTime());
+
+		glm::vec4 vec(1.0, 0.0, 0.0, 1.0);
+		glm::mat4 transform = glm::mat4(1.0);
+		transform = glm::translate(transform, glm::vec3(-0.5f, -0.2f, 0.0f));
+		transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+		transform = glm::scale(transform, glm::vec3(2.0f, 0.5f, 1.0f));
+
+		shader.SetMat4("transform", transform);
 		//shader.SetInt("myTexture", texture);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

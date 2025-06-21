@@ -3,6 +3,9 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 class Shader
 {
 public:
@@ -12,6 +15,7 @@ public:
 	void SetBool(const char* uniformName, bool value);
 	void SetFloat(const char* uniformName, float value);
 	void SetInt(const char* uniformName, int value);
+	void SetMat4(const char* uniformName, const glm::mat4& value);
 	void SetTexture(const char* uniformName, GLuint textureID, int location);
 private:
 	static GLuint lastUsedProgram;

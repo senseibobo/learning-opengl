@@ -106,6 +106,12 @@ void Shader::SetInt(const char* uniformName, int value)
 	glUniform1i(location, value);
 }
 
+void Shader::SetMat4(const char* uniformName, const glm::mat4& value)
+{
+	GLint location = glGetUniformLocation(ID, uniformName);
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+}
+
 void Shader::SetTexture(const char* uniformName, GLuint textureID, int location)
 {
 	this->Use();

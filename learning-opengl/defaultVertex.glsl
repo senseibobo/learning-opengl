@@ -6,10 +6,14 @@ out vec2 UV;
 out vec3 Pos;
 
 uniform float time;
+uniform mat4 transform;
 
 void main()
 {
-	gl_Position = vec4(aPos.x+mod(time,1.0), -aPos.y, aPos.z, 1.0);
+	vec4 resultPosition = vec4(aPos.xyz,1.0f);
+	resultPosition = transform * resultPosition;
+	resultPosition.x += mod(time,1.0);
+	gl_Position = resultPosition;
 	UV = aUV;
 	Pos = gl_Position.xyz;
 }
