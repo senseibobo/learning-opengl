@@ -63,9 +63,67 @@ int main() {
 		1,2,3
 	};
 
+	float cubeVertices[] = {
+		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+		 0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f, 0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f, 1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f, 1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f, 1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f, 0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f, 1.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f, 1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f, 0.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, 0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f, 0.0f, 1.0f
+	};
+
 	Shader shader("./defaultVertex.glsl", "./defaultFragment.glsl");
 
 
+
+	// cube
+	GLuint cubeVAO;
+	glGenVertexArrays(1, &cubeVAO);
+	glBindVertexArray(cubeVAO);
+
+	GLuint cubeVBO;
+	glGenBuffers(1, &cubeVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3*sizeof(float)));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+
+
+
+	// plane
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
@@ -98,42 +156,51 @@ int main() {
 
 
 	// projection
-	glm::mat4 projection = glm::perspective(glm::radians(60.0f),800.0f/600.0f, 0.01f, 100.0f);
+	glEnable(GL_DEPTH_TEST);
 
 
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
 
 		glClearColor(0.1, 0.6, 0.2, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, -5.0f);
 		glm::vec3 cameraRotation = glm::vec3(cos(glfwGetTime()*5.0f)/3.0f, 0.0f, 0.0f);
 
-		// camera view transform
+		glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::normalize(glm::vec3(1.0f,1.0f,0.0f)));
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::rotate(view, -cameraRotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 		view = glm::rotate(view, -cameraRotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
 		view = glm::rotate(view, -cameraRotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
 		view = glm::translate(view, cameraPosition);
+		glm::mat4 projection = glm::perspective(glm::radians(60.0f), 800.0f / 600.0f, 0.01f, 100.0f);
+
+
+
 		shader.Use();
 		//shader.SetFloat("time", glfwGetTime());
+		shader.SetMat4("model", model);
 		shader.SetMat4("view", view);
 		shader.SetMat4("projection", projection);
 
-		glm::mat4 transform = glm::mat4(1.0f);
-		transform = glm::translate(transform, glm::vec3(-0.5f, -0.2f, 0.0f));
-		transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-		transform = glm::scale(transform, glm::vec3(2.0f, 0.5f, 1.0f));
-		shader.SetMat4("model", transform);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//glm::mat4 transform = glm::mat4(1.0f);
+		//transform = glm::translate(transform, glm::vec3(-0.5f, -0.2f, 0.0f));
+		//transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+		//transform = glm::scale(transform, glm::vec3(2.0f, 0.5f, 1.0f));
+		//shader.SetMat4("model", transform);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		glm::mat4 transform2 = glm::mat4(1.0f);
-		transform2 = glm::scale(transform2, glm::vec3(sin(glfwGetTime()), (cos(glfwGetTime())+3.0f)/4.0f, 1.0f));
-		transform2 = glm::translate(transform2, glm::vec3(0.5f, 0.0f, 1.0f));
-		shader.SetMat4("model", transform2);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//glm::mat4 transform2 = glm::mat4(1.0f);
+		//transform2 = glm::scale(transform2, glm::vec3(sin(glfwGetTime()), (cos(glfwGetTime())+3.0f)/4.0f, 1.0f));
+		//transform2 = glm::translate(transform2, glm::vec3(0.5f, 0.0f, 1.0f));
+		//shader.SetMat4("model", transform2);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+
+		glBindVertexArray(cubeVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
 
