@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "Shader.h"
+#include "Texture2D.h"
 #include "stb_image.h"
 
 
@@ -83,34 +84,12 @@ int main() {
 	int width, height, nrChannels;
 	unsigned char* imageData = stbi_load("./texture.png", &width, &height, &nrChannels, 0);
 
-	GLuint texture1;
-	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D, texture1);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	stbi_image_free(imageData);
-	
-
-	imageData = stbi_load("./container.jpg", &width, &height, &nrChannels, 0);
-	GLuint texture2;
-	glGenTextures(1, &texture2);
-	glBindTexture(GL_TEXTURE_2D, texture2);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	stbi_image_free(imageData);
+	Texture2D texture1("./texture.png", GL_RGBA);
+	Texture2D texture2("./container.jpg", GL_RGB);
 
 	shader.Use();
-	shader.SetInt("myTexture", 0);
-	shader.SetInt("otherTexture", 1);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture1);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, texture2);
+	shader.SetTexture("myTexture", texture1.ID, 0);
+	shader.SetTexture("otherTexture", texture2.ID, 1);
 
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);

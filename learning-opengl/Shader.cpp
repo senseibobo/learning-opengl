@@ -1,5 +1,6 @@
 #include "Shader.h"
 
+GLuint Shader::lastUsedProgram = -1;
 
 void Shader::checkShaderCompiled(GLuint shader)
 {
@@ -79,7 +80,11 @@ Shader::Shader(const char* vertexSourcePath, const char* fragmentSourcePath)
 
 void Shader::Use() 
 {
-	glUseProgram(ID);
+	if (ID != lastUsedProgram)
+	{
+		glUseProgram(ID);
+		lastUsedProgram = ID;
+	}
 }
 
 
@@ -99,4 +104,12 @@ void Shader::SetInt(const char* uniformName, int value)
 {
 	GLint location = glGetUniformLocation(ID, uniformName);
 	glUniform1i(location, value);
+}
+
+void Shader::SetTexture(const char* uniformName, GLuint textureID, int location)
+{
+	this->Use();
+	glActiveTexture(GL_TEXTURE0+location);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	this->SetInt(uniformName, location);
 }
