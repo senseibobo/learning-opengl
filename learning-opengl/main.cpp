@@ -27,6 +27,7 @@ void processInput(GLFWwindow* window)
 int main() {
 
 
+	stbi_set_flip_vertically_on_load(true);
 	glfwInit();
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -100,6 +101,18 @@ int main() {
 		 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
 		-0.5f,  0.5f,  0.5f, 0.0f, 0.0f,
 		-0.5f,  0.5f, -0.5f, 0.0f, 1.0f
+	}; 
+	glm::vec3 cubePositions[] = {
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(2.0f, 5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f, 3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f, 2.0f, -2.5f),
+		glm::vec3(1.5f, 0.2f, -1.5f),
+		glm::vec3(-1.3f, 1.0f, -1.5f)
 	};
 
 	Shader shader("./defaultVertex.glsl", "./defaultFragment.glsl");
@@ -167,9 +180,8 @@ int main() {
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, -5.0f);
-		glm::vec3 cameraRotation = glm::vec3(cos(glfwGetTime()*5.0f)/3.0f, 0.0f, 0.0f);
+		glm::vec3 cameraRotation = glm::vec3(cos(glfwGetTime()*1.0f)/10.0f, 0.0f, 0.0f);
 
-		glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::normalize(glm::vec3(1.0f,1.0f,0.0f)));
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::rotate(view, -cameraRotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 		view = glm::rotate(view, -cameraRotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -180,10 +192,18 @@ int main() {
 
 
 		shader.Use();
-		//shader.SetFloat("time", glfwGetTime());
-		shader.SetMat4("model", model);
 		shader.SetMat4("view", view);
 		shader.SetMat4("projection", projection);
+		//shader.SetFloat("time", glfwGetTime());
+		for (int i = 0; i < 10; i++)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			model = glm::rotate(model, (float)glfwGetTime()*(i%3), glm::normalize(glm::vec3(1.0f, 1.0f, 0.0f)));
+			shader.SetMat4("model", model);
+			glBindVertexArray(cubeVAO);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
 		//glm::mat4 transform = glm::mat4(1.0f);
 		//transform = glm::translate(transform, glm::vec3(-0.5f, -0.2f, 0.0f));
@@ -199,8 +219,6 @@ int main() {
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 
-		glBindVertexArray(cubeVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
 
