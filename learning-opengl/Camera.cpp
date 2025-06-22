@@ -85,19 +85,17 @@ void Camera::Rotate(float angle, const glm::vec3& axis)
 void Camera::RotateYaw(float angle)
 {
 	yaw += angle;
-	glm::mat4 rotationMatrix = glm::mat4(1.0f);
-	rotationMatrix = glm::rotate(rotationMatrix, -yaw, glm::vec3(0.0f, 1.0f, 0.0f));
-	rotationMatrix = glm::rotate(rotationMatrix, -pitch, glm::vec3(1.0f, 0.0f, 0.0f));
-	direction = rotationMatrix * glm::vec4(0.0f,0.0f,1.0f,1.0f);
+	direction.x = glm::sin(-yaw);
+	direction.z = glm::cos(-yaw);
+	direction.y = glm::sin(pitch);
 	updateVectors();
 }
 
 void Camera::RotatePitch(float angle)
 {
 	pitch += angle;
-	glm::mat4 rotationMatrix = glm::mat4(1.0f);
-	rotationMatrix = glm::rotate(rotationMatrix, -yaw, glm::vec3(0.0f, 1.0f, 0.0f));
-	rotationMatrix = glm::rotate(rotationMatrix, -pitch, glm::vec3(1.0f, 0.0f, 0.0f));
-	direction = rotationMatrix * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+	direction.x = glm::sin(-yaw);
+	direction.z = glm::cos(-yaw);
+	direction.y = glm::sin(pitch);
 	updateVectors();
 }
