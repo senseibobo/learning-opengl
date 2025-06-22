@@ -13,6 +13,8 @@
 Camera* camera;
 double oldTime = 0.0f;
 double deltaTime = 0.0001f;
+double oldMouseX;
+double oldMouseY;
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -20,6 +22,14 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
+
+void mouse_callback(GLFWwindow*, double mouseX, double mouseY)
+{
+	camera->RotateYaw((mouseX - oldMouseX)*0.005f);
+	camera->RotatePitch(-(mouseY - oldMouseY)*0.005f);
+	oldMouseX = mouseX;
+	oldMouseY = mouseY;
+}
 
 void processInput(GLFWwindow* window)
 {
@@ -192,6 +202,10 @@ int main() {
 	shader.Use();
 	shader.SetTexture("myTexture", texture1.ID, 0);
 	shader.SetTexture("otherTexture", texture2.ID, 1);
+
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouse_callback);
 
 
 	glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, -10.0f);
