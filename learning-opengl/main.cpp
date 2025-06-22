@@ -9,6 +9,9 @@
 #include "Camera.h"
 #include "stb_image.h"
 
+#include "Inc/VBO.h"
+#include "Inc/VAO.h"
+
 
 Camera* camera;
 double oldTime = 0.0f;
@@ -147,6 +150,10 @@ int main() {
 
 
 	// cube
+	/*
+	* Sorry about this, you uncomment your code and delete mine if you want to.
+	* 
+	* 
 	GLuint cubeVAO;
 	glGenVertexArrays(1, &cubeVAO);
 	glBindVertexArray(cubeVAO);
@@ -161,6 +168,13 @@ int main() {
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
+	*/
+
+	VAO cubeVAO;
+	VBO cubeVBO(sizeof(cubeVertices), cubeVertices);
+	cubeVAO.LinkAttrib(cubeVBO, 0, 3, GL_FLOAT, 5 * sizeof(GLfloat), (GLvoid*)0);
+	cubeVAO.LinkAttrib(cubeVBO, 1, 2, GL_FLOAT, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	cubeVAO.Unbind();
 
 
 	// plane
@@ -235,7 +249,10 @@ int main() {
 			model = glm::translate(model, cubePositions[i]);
 			model = glm::rotate(model, (float)glfwGetTime()*(i%3), glm::normalize(glm::vec3(1.0f, 1.0f, 0.0f)));
 			shader.SetMat4("model", model);
-			glBindVertexArray(cubeVAO);
+			
+		//	glBindVertexArray(cubeVAO);
+			texture2.Bind();
+			cubeVAO.Bind();
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
@@ -260,6 +277,13 @@ int main() {
 		glfwPollEvents();
 		oldTime = glfwGetTime();
 	}
+	/**
+	* By the way you forgot to de-allocate resources
+	* */
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
+	glDeleteVertexArrays(1, &VAO);
+	
 	glfwTerminate();
 	return 0;
 

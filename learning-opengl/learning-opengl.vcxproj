@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\libs\glm;C:\libs\glad\include;C:\libs\glfw\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\libs\glfw\libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\libs\glm;C:\libs\glad\include;C:\libs\glfw\include;C:\includes;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\lib;C:\libs\glfw\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -132,22 +132,32 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="C:\libs\glad\src\glad.c" />
+    <ClCompile Include="..\..\..\Downloads\REPOS\LearnOpenGL-master\LearnOpenGL-master\src\glad.c" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Src\EBO.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="Texture2D.cpp" />
+    <ClCompile Include="Src\VAO.cpp" />
+    <ClCompile Include="Src\VBO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Inc\EBO.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture2D.h" />
+    <ClInclude Include="Inc\VAO.h" />
+    <ClInclude Include="Inc\VBO.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="defaultFragment.glsl" />
     <None Include="defaultVertex.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="container.jpg" />
+    <Image Include="texture.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
