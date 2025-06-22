@@ -11,8 +11,8 @@
 
 
 Camera* camera;
-float oldTime = 0.0f;
-float deltaTime = 0.0001f;
+double oldTime = 0.0f;
+double deltaTime = 0.0001f;
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -30,21 +30,21 @@ void processInput(GLFWwindow* window)
 	if (camera != nullptr)
 	{
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-			camera->Move(camera->GetForwardVector() * camera->GetSpeed() * deltaTime);
+			camera->Move(camera->GetForwardVector() * camera->GetSpeed() * (float)deltaTime);
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			camera->Move(-camera->GetRightVector() * camera->GetSpeed() * deltaTime);
+			camera->Move(-camera->GetRightVector() * camera->GetSpeed() * (float)deltaTime);
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-			camera->Move(-camera->GetForwardVector() * camera->GetSpeed() * deltaTime);
+			camera->Move(-camera->GetForwardVector() * camera->GetSpeed() * (float)deltaTime);
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-			camera->Move(camera->GetRightVector() * camera->GetSpeed() * deltaTime);
+			camera->Move(camera->GetRightVector() * camera->GetSpeed() * (float)deltaTime);
 		
 		float rotationSpeed = 2.0f;
 		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-			camera->Rotate(-rotationSpeed * deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
+			camera->RotateYaw(rotationSpeed * deltaTime);
 		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
 			camera->Rotate(rotationSpeed * deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
 		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-			camera->Rotate(rotationSpeed * deltaTime, camera->GetRightVector());
+			camera->RotatePitch(rotationSpeed * deltaTime);
 		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 			camera->Rotate(-rotationSpeed * deltaTime, camera->GetRightVector());
 	}
@@ -204,8 +204,12 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 
+	float fpsCap = 144.0f;
+
 	while (!glfwWindowShouldClose(window)) {
-		deltaTime = glm::clamp((float)glfwGetTime() - oldTime,0.0001f, 1.0f);
+	
+		deltaTime = glfwGetTime() - oldTime;
+		if (deltaTime < 1.0f / fpsCap) continue;
 		//std::cout << camera->GetPosition().x << camera->GetPosition().y << camera->GetPosition().z<<"\n";
 		processInput(window);
 

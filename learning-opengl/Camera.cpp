@@ -43,6 +43,7 @@ void Camera::SetDirection(const glm::vec3& direction)
 {
 	this->direction = direction;
 	updateVectors();
+	updateYawPitch();
 }
 
 void Camera::SetSpeed(float speed)
@@ -62,6 +63,12 @@ void Camera::updateVectors()
 	upVector = glm::normalize(glm::cross(forwardVector, rightVector));
 }
 
+void Camera::updateYawPitch()
+{
+	yaw = -glm::atan(direction.x, direction.z);
+	pitch = glm::atan(direction.y, glm::length(glm::vec2(direction.x, direction.z)));
+}
+
 
 void Camera::Move(const glm::vec3& moveVector)
 {
@@ -72,6 +79,25 @@ void Camera::Rotate(float angle, const glm::vec3& axis)
 {
 	glm::mat4 rotationMatrix = glm::mat4(1.0f);
 	rotationMatrix = glm::rotate(rotationMatrix, angle, axis);
-	direction = rotationMatrix * glm::vec4(direction, 1.0f);
+	SetDirection(glm::normalize(rotationMatrix * glm::vec4(direction, 1.0f)));
+}
+
+void Camera::RotateYaw(float angle)
+{
+	yaw += angle;
+	glm::mat4 rotationMatrix = glm::mat4(1.0f);
+	rotationMatrix = glm::rotate(rotationMatrix, -yaw, glm::vec3(0.0f, 1.0f, 0.0f));
+	rotationMatrix = glm::rotate(rotationMatrix, -pitch, glm::vec3(1.0f, 0.0f, 0.0f));
+	direction = rotationMatrix * glm::vec4(0.0f,0.0f,1.0f,1.0f);
+	updateVectors();
+}
+
+void Camera::RotatePitch(float angle)
+{
+	pitch += angle;
+	glm::mat4 rotationMatrix = glm::mat4(1.0f);
+	rotationMatrix = glm::rotate(rotationMatrix, -yaw, glm::vec3(0.0f, 1.0f, 0.0f));
+	rotationMatrix = glm::rotate(rotationMatrix, -pitch, glm::vec3(1.0f, 0.0f, 0.0f));
+	direction = rotationMatrix * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 	updateVectors();
 }

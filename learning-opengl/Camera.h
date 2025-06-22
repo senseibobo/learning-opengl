@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
 class Camera
 {
 public:
@@ -9,6 +10,8 @@ public:
 	glm::mat4 GetViewMatrix() const;
 	void Move(const glm::vec3& moveVector);
 	void Rotate(float angle, const glm::vec3& axis);
+	void RotateYaw(float angle);
+	void RotatePitch(float angle);
 	void LookAt(const glm::vec3& targetPosition);
 	glm::vec3 GetRightVector() const;
 	glm::vec3 GetForwardVector() const;
@@ -19,11 +22,17 @@ public:
 	float GetSpeed() const;
 private:
 	void updateVectors();
+	void updateYawPitch();
 	float speed;
+
+	float yaw;
+	float pitch;
+	
 	glm::vec3 position;
 	glm::vec3 direction;
 	glm::vec3 rightVector;
 	glm::vec3 upVector;
 	glm::vec3 forwardVector;
+	
 };
 
