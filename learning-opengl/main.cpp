@@ -6,7 +6,13 @@
 #include <iostream>
 #include "Shader.h"
 #include "Texture2D.h"
+#include "Camera.h"
 #include "stb_image.h"
+
+
+Camera* camera;
+float oldTime = 0.0f;
+float deltaTime = 0.0001f;
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -20,6 +26,27 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, true);
+	}
+	if (camera != nullptr)
+	{
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			camera->Move(camera->GetForwardVector() * camera->GetSpeed() * deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			camera->Move(-camera->GetRightVector() * camera->GetSpeed() * deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			camera->Move(-camera->GetForwardVector() * camera->GetSpeed() * deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			camera->Move(camera->GetRightVector() * camera->GetSpeed() * deltaTime);
+		
+		float rotationSpeed = 2.0f;
+		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+			camera->Rotate(-rotationSpeed * deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
+		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+			camera->Rotate(rotationSpeed * deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
+		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+			camera->Rotate(rotationSpeed * deltaTime, camera->GetRightVector());
+		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+			camera->Rotate(-rotationSpeed * deltaTime, camera->GetRightVector());
 	}
 }
 
@@ -167,12 +194,19 @@ int main() {
 	shader.SetTexture("otherTexture", texture2.ID, 1);
 
 
+	glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, -10.0f);
+	glm::vec3 cameraDirection = glm::normalize(glm::vec3(0.0f, 0.0f, 0.0f) - cameraPosition);
+
+	camera = new Camera(cameraPosition, cameraDirection);
+
 
 	// projection
 	glEnable(GL_DEPTH_TEST);
 
 
 	while (!glfwWindowShouldClose(window)) {
+		deltaTime = glm::clamp((float)glfwGetTime() - oldTime,0.0001f, 1.0f);
+		//std::cout << camera->GetPosition().x << camera->GetPosition().y << camera->GetPosition().z<<"\n";
 		processInput(window);
 
 		glClearColor(0.1, 0.6, 0.2, 1.0);
@@ -182,11 +216,7 @@ int main() {
 		glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, -5.0f);
 		glm::vec3 cameraRotation = glm::vec3(cos(glfwGetTime()*1.0f)/10.0f, 0.0f, 0.0f);
 
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::rotate(view, -cameraRotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-		view = glm::rotate(view, -cameraRotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-		view = glm::rotate(view, -cameraRotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-		view = glm::translate(view, cameraPosition);
+		glm::mat4 view = camera->GetViewMatrix();
 		glm::mat4 projection = glm::perspective(glm::radians(60.0f), 800.0f / 600.0f, 0.01f, 100.0f);
 
 
@@ -224,6 +254,7 @@ int main() {
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+		oldTime = glfwGetTime();
 	}
 	glfwTerminate();
 	return 0;
