@@ -8,6 +8,7 @@ class Camera
 public:
 	Camera(const glm::vec3& position, const glm::vec3& direction);
 	glm::mat4 GetViewMatrix() const;
+	glm::mat4 GetProjectionMatrix() const;
 	void Move(const glm::vec3& moveVector);
 	void Rotate(float angle, const glm::vec3& axis);
 	void RotateYaw(float angle);
@@ -20,10 +21,15 @@ public:
 	void SetDirection(const glm::vec3& direction);
 	void SetSpeed(float speed);
 	float GetSpeed() const;
+	float GetFov() const;
+	void SetFov(float fov);
 private:
 	void updateVectors();
-	void updateYawPitch();
+	void recalculateYawPitch();
+	void recalculateDirection();
 	float speed;
+
+	float fov;
 
 	float yaw;
 	float pitch;
