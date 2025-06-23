@@ -179,16 +179,26 @@ int main() {
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
-	std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(cubeVertices, 36);
-	std::shared_ptr<Material> material = std::make_shared<Material>();
-	material->SetShader(shader);
-	material->SetTexture("myTexture", texture1);
-	material->SetTexture("otherTexture", texture2);
-	Node3D cube;
-	auto renderComponent = std::make_unique<RenderComponent>();
-	renderComponent->SetMaterial(material);
-	renderComponent->SetMesh(mesh);
-	cube.AddComponent(std::move(renderComponent));
+	std::shared_ptr<Mesh> cubeMesh = std::make_shared<Mesh>(cubeVertices, 36);
+	std::shared_ptr<Material> material1 = std::make_shared<Material>();
+	std::shared_ptr<Material> material2 = std::make_shared<Material>();
+	material1->SetShader(shader);
+	material1->SetTexture("myTexture", texture1);
+	material1->SetTexture("otherTexture", texture1);
+	material2->SetShader(shader);
+	material2->SetTexture("myTexture", texture2);
+	material2->SetTexture("otherTexture", texture2);
+	Node3D cube1;
+	auto renderComponent1 = std::make_unique<RenderComponent>();
+	renderComponent1->SetMaterial(material1);
+	renderComponent1->SetMesh(cubeMesh);
+	cube1.AddComponent(std::move(renderComponent1));
+	Node3D cube2;
+	auto renderComponent2 = std::make_unique<RenderComponent>();
+	renderComponent2->SetMaterial(material2);
+	renderComponent2->SetMesh(cubeMesh);
+	cube2.AddComponent(std::move(renderComponent2));
+	cube2.transform.Translate(glm::vec3(2.0f, 0.0f, 0.0f));
 
 
 

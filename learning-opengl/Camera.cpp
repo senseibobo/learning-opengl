@@ -116,6 +116,7 @@ void Camera::RotateYaw(float angle)
 void Camera::RotatePitch(float angle)
 {
 	pitch += angle;
+	pitch = glm::clamp(pitch, -1.5f, 1.5f);
 	recalculateDirection();
 	updateVectors();
 }

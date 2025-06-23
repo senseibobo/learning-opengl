@@ -59,6 +59,11 @@ void Transform::SetScale(const glm::vec3& scale)
 	updateMatrix();
 }
 
+void Transform::Translate(const glm::vec3& translation)
+{
+	SetPosition(GetPosition() + translation);
+}
+
 glm::vec3 Transform::GetPosition() const
 {
 	return position;

@@ -17,6 +17,8 @@ public:
 	void SetQuaternion(const glm::quat& quaternion);
 	void SetScale(const glm::vec3& scale);
 
+	void Translate(const glm::vec3& translation);
+
 	glm::vec3 GetPosition() const;
 	glm::vec3 GetScale() const;
 	glm::vec3 GetEuler() const;

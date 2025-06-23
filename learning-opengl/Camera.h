@@ -7,22 +7,25 @@ class Camera
 {
 public:
 	Camera(const glm::vec3& position, const glm::vec3& direction);
-	glm::mat4 GetViewMatrix() const;
-	glm::mat4 GetProjectionMatrix() const;
+
 	void Move(const glm::vec3& moveVector);
 	void Rotate(float angle, const glm::vec3& axis);
 	void RotateYaw(float angle);
 	void RotatePitch(float angle);
 	void LookAt(const glm::vec3& targetPosition);
+
+	void SetDirection(const glm::vec3& direction);
+	void SetSpeed(float speed);
+	void SetFov(float fov);
+
 	glm::vec3 GetRightVector() const;
 	glm::vec3 GetForwardVector() const;
 	glm::vec3 GetUpVector() const;
 	glm::vec3 GetPosition() const;
-	void SetDirection(const glm::vec3& direction);
-	void SetSpeed(float speed);
+	glm::mat4 GetViewMatrix() const;
+	glm::mat4 GetProjectionMatrix() const;
 	float GetSpeed() const;
 	float GetFov() const;
-	void SetFov(float fov);
 private:
 	void updateVectors();
 	void recalculateYawPitch();
