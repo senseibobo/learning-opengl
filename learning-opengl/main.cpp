@@ -7,7 +7,10 @@
 #include "Shader.h"
 #include "Texture2D.h"
 #include "Camera.h"
+#include "RenderComponent.h"
+#include "RenderingManager.h"
 #include "Mesh.h"
+#include "Node3D.h"
 #include "stb_image.h"
 
 
@@ -162,9 +165,8 @@ int main() {
 	glm::vec3 cameraDirection = glm::normalize(glm::vec3(0.0f, 0.0f, 0.0f) - cameraPosition);
 	camera = new Camera(cameraPosition, cameraDirection);
 	Shader* shader = new Shader("./defaultVertex.glsl", "./defaultFragment.glsl");
+	RenderingManager::SetCamera(camera);
 
-	Mesh mesh(cubeVertices, 36, shader, camera);
-	mesh.SetPosition(glm::vec3(1.0f, 1.0f, 1.0f));
 
 	int width, height, nrChannels;
 	unsigned char* imageData = stbi_load("./texture.png", &width, &height, &nrChannels, 0);
@@ -181,6 +183,9 @@ int main() {
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
+	Mesh* mesh = new Mesh(cubeVertices, 36);
+	Node3D cube;
+	cube.AddComponent(std::make_unique<RenderComponent>());
 
 
 
@@ -200,8 +205,8 @@ int main() {
 		glClearColor(0.1, 0.6, 0.2, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		mesh.Draw();
 
+		RenderingManager::Render();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
