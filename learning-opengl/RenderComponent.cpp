@@ -2,33 +2,36 @@
 
 
 
-void RenderComponent::SetMesh(Mesh* mesh)
+void RenderComponent::SetMesh(std::shared_ptr<Mesh> mesh)
 {
 	this->mesh = mesh;
 }
 
-void RenderComponent::SetShader(Shader* shader)
+void RenderComponent::SetMaterial(std::shared_ptr<Material> material)
 {
-	this->shader = shader;
+	this->material = material;
 }
 
-void RenderComponent::Draw(Camera* camera)
+Material* RenderComponent::GetMaterial()
+{
+	return material.get();
+}
+
+Mesh* RenderComponent::GetMesh()
+{
+	return mesh.get();
+}
+
+glm::mat4 RenderComponent::GetTransformMatrix() const
 {
 	Node3D* node3d = dynamic_cast<Node3D*>(owner);
 	if (!node3d)
 	{
 		std::cout << "It's not a node3d :(\n";
+		return glm::mat4();
 	}
-	else {
-		shader->SetMat4("model", node3d->transform.GetMatrix());
-
-		glBindVertexArray(mesh->GetVAO());
-		glDrawArrays(GL_TRIANGLES, 0, mesh->GetVertexCount());
-		std::cout << "drawing\n";
+	else
+	{
+		return node3d->transform.GetMatrix();
 	}
-}
-
-Shader* RenderComponent::GetShader()
-{
-	return shader;
 }

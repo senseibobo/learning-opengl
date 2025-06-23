@@ -164,29 +164,29 @@ int main() {
 	glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, -10.0f);
 	glm::vec3 cameraDirection = glm::normalize(glm::vec3(0.0f, 0.0f, 0.0f) - cameraPosition);
 	camera = new Camera(cameraPosition, cameraDirection);
-	Shader* shader = new Shader("./defaultVertex.glsl", "./defaultFragment.glsl");
+	std::shared_ptr<Shader> shader = std::make_shared<Shader>("./defaultVertex.glsl", "./defaultFragment.glsl");
 	RenderingManager::SetCamera(camera);
 
 
 	int width, height, nrChannels;
 	unsigned char* imageData = stbi_load("./texture.png", &width, &height, &nrChannels, 0);
 
-	Texture2D texture1("./texture.png", GL_RGBA);
-	Texture2D texture2("./container.jpg", GL_RGB);
-
-	shader->Use();
-	shader->SetTexture("myTexture", texture1.ID, 0);
-	shader->SetTexture("otherTexture", texture2.ID, 1);
+	std::shared_ptr<Texture2D> texture1 = std::make_shared<Texture2D>("./texture.png", GL_RGBA);
+	std::shared_ptr<Texture2D> texture2 = std::make_shared<Texture2D>("./container.jpg", GL_RGB);
 
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
-	Mesh* mesh = new Mesh(cubeVertices, 36);
+	std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(cubeVertices, 36);
+	std::shared_ptr<Material> material = std::make_shared<Material>();
+	material->SetShader(shader);
+	material->SetTexture("myTexture", texture1);
+	material->SetTexture("otherTexture", texture2);
 	Node3D cube;
 	auto renderComponent = std::make_unique<RenderComponent>();
-	renderComponent->SetShader(shader);
+	renderComponent->SetMaterial(material);
 	renderComponent->SetMesh(mesh);
 	cube.AddComponent(std::move(renderComponent));
 

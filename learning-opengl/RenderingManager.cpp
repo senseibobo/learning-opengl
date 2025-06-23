@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "RenderingManager.h"
 #include "RenderComponent.h"
 
@@ -11,32 +12,44 @@ void RenderingManager::SetCamera(Camera* newCamera)
 
 void RenderingManager::Render()
 {
-	for (int i = 0; i < ((int)renderComponents.size()) - 1; i++)
-	{
-		for (int j = i + 1; j < ((int)renderComponents.size()); j++)
-		{
-			RenderComponent* rc1 = renderComponents[i];
-			RenderComponent* rc2 = renderComponents[j];
-			GLuint shader1 = rc1->GetShader()->ID;
-			GLuint shader2 = rc2->GetShader()->ID;
-			if (shader2 > shader1)
-			{
-				std::swap(rc1, rc2);
-			}
-		}
-	}
-	Shader* lastShader = nullptr;
+	std::vector<RenderCommand> renderCommands;
 	for (RenderComponent* renderComponent : renderComponents)
 	{
-		Shader* shader = renderComponent->GetShader();
-		if (renderComponent->GetShader() != lastShader)
+		RenderCommand renderCommand;
+		renderCommand.material = renderComponent->GetMaterial();
+		renderCommand.shader = renderComponent->GetMaterial()->GetShader();
+		renderCommand.mesh = renderComponent->GetMesh();
+		renderCommand.transform = renderComponent->GetTransformMatrix();
+		renderCommand.sortKey = (uint64_t(renderCommand.shader->ID) << 32 | uint64_t(renderCommand.material->ID));
+		renderCommands.push_back(renderCommand);
+	}
+	auto begin = renderCommands.begin();
+	auto end = renderCommands.end();
+	auto compareFunc = [](const RenderCommand& rc1, const RenderCommand& rc2) {
+		return rc1.sortKey > rc2.sortKey;
+		};
+	std::sort(begin, end, compareFunc);
+	Shader* lastShader = nullptr;
+	Material* lastMaterial = nullptr;
+	for (const RenderCommand& renderCommand : renderCommands)
+	{
+		if (renderCommand.shader != lastShader)
 		{
-			shader->Use();
-			shader->SetMat4("projection", camera->GetProjectionMatrix());
-			shader->SetMat4("view", camera->GetViewMatrix());
-			lastShader = shader;
+			renderCommand.shader->Use();
+			renderCommand.shader->SetMat4("projection", camera->GetProjectionMatrix());
+			renderCommand.shader->SetMat4("view", camera->GetViewMatrix());
+			lastShader = renderCommand.shader;
 		}
-		renderComponent->Draw(camera);
+		if (renderCommand.material != lastMaterial)
+		{
+			renderCommand.material->Bind();
+			lastMaterial = renderCommand.material;
+		}
+
+		renderCommand.shader->SetMat4("model", renderCommand.transform);
+		
+		glBindVertexArray(renderCommand.mesh->GetVAO());
+		glDrawArrays(GL_TRIANGLES, 0, renderCommand.mesh->GetVertexCount());
 	}
 }
 

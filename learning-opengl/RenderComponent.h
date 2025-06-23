@@ -2,7 +2,7 @@
 #include "Node3D.h"
 #include "Mesh.h"
 #include "Camera.h"
-#include "Shader.h"
+#include "Material.h"
 #include "Component.h"
 #include "RenderingManager.h"
 class RenderComponent :
@@ -13,16 +13,17 @@ public:
     RenderComponent() : Component() 
     {
         mesh = nullptr;
-        shader = nullptr;
+        material = nullptr;
         RenderingManager::AddRenderComponent(this);
     };
-    void SetMesh(Mesh* mesh);
-    void SetShader(Shader* shader);
-    void Draw(Camera* camera);
+    void SetMesh(std::shared_ptr<Mesh> mesh);
+    void SetMaterial(std::shared_ptr<Material> material);
 
-    Shader* GetShader();
+    Material* GetMaterial();
+    Mesh* GetMesh();
+    glm::mat4 GetTransformMatrix() const;
 private:
-    Mesh* mesh;
-    Shader* shader;
+    std::shared_ptr<Mesh> mesh;
+    std::shared_ptr<Material> material;
 };
 
