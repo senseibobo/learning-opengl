@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
-class Component;
+#include "Component.h"
 class Node
 {
 public:

@@ -81,7 +81,7 @@ glm::vec3 Transform::GetScale() const
 
 glm::mat4 Transform::GetMatrix() const
 {
-	return glm::mat4();
+	return matrix;
 }
 
 void Transform::updateMatrix()

@@ -15,11 +15,17 @@ void RenderComponent::SetShader(Shader* shader)
 void RenderComponent::Draw(Camera* camera)
 {
 	Node3D* node3d = dynamic_cast<Node3D*>(owner);
-	shader->SetMat4("model", node3d->transform.GetMatrix());
+	if (!node3d)
+	{
+		std::cout << "It's not a node3d :(\n";
+	}
+	else {
+		shader->SetMat4("model", node3d->transform.GetMatrix());
 
-	glBindVertexArray(mesh->GetVAO());
-	glDrawArrays(GL_TRIANGLES, 0, mesh->GetVertexCount());
-	std::cout << "drawingg\n";
+		glBindVertexArray(mesh->GetVAO());
+		glDrawArrays(GL_TRIANGLES, 0, mesh->GetVertexCount());
+		std::cout << "drawing\n";
+	}
 }
 
 Shader* RenderComponent::GetShader()

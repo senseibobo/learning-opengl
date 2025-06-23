@@ -1,5 +1,5 @@
 #pragma once
-#include "Node.h"
+class Node;
 class Component
 {
 	friend class Node;

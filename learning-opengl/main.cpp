@@ -185,7 +185,10 @@ int main() {
 
 	Mesh* mesh = new Mesh(cubeVertices, 36);
 	Node3D cube;
-	cube.AddComponent(std::make_unique<RenderComponent>());
+	auto renderComponent = std::make_unique<RenderComponent>();
+	renderComponent->SetShader(shader);
+	renderComponent->SetMesh(mesh);
+	cube.AddComponent(std::move(renderComponent));
 
 
 
@@ -204,7 +207,6 @@ int main() {
 
 		glClearColor(0.1, 0.6, 0.2, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
 		RenderingManager::Render();
 
