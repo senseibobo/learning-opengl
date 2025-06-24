@@ -75,6 +75,13 @@ Shader::Shader(const char* vertexSourcePath, const char* fragmentSourcePath)
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
+	GLuint blockIndex = glGetUniformBlockIndex(ID, "LightBlock");
+	if (blockIndex != GL_INVALID_INDEX) {
+		GLuint bindingPoint = 1;
+		glUniformBlockBinding(ID, blockIndex, bindingPoint);
+	}
+
+
 	checkProgramLinked(ID);
 }
 
@@ -124,4 +131,9 @@ void Shader::SetTexture(const char* uniformName, GLuint textureID, int location)
 	glActiveTexture(GL_TEXTURE0+location);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	this->SetInt(uniformName, location);
+}
+
+GLuint Shader::GetLightBindingPoint() const
+{
+	return 1;
 }

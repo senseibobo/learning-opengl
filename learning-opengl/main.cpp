@@ -81,6 +81,7 @@ void processInput(GLFWwindow* window)
 int main() {
 
 
+
 	stbi_set_flip_vertically_on_load(true);
 	glfwInit();
 
@@ -109,6 +110,10 @@ int main() {
 	glViewport(0, 0, 800, 600);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+	const GLubyte* version = glGetString(GL_VERSION);
+	const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+	std::cout << "VERSION: " << version << "\n";
+	std::cout << "GLSL VERSION: " << glslVersion << "\n";
 
 	float vertices[] = {
 		0.5f,  0.5f, 0.0f, 0.0f, 0.0f,
@@ -179,8 +184,6 @@ int main() {
 	glm::vec3 cameraDirection = glm::normalize(glm::vec3(0.0f, 0.0f, 0.0f) - cameraPosition);
 	camera = new Camera(cameraPosition, cameraDirection);
 
-	glm::vec3 lightPos = glm::vec3(1.0f, 3.0f, 0.2f);
-
 	RenderingManager::SetCamera(camera);
 
 
@@ -198,13 +201,9 @@ int main() {
 
 	material1->SetShader(shader);
 	material1->SetTexture("myTexture", texture1);
-	material1->SetVec3("lightPos", lightPos);
-	material1->SetVec3("lightColor", glm::vec3(1.0f, 0.6f, 0.5f));
 
 	material2->SetShader(shader);
 	material2->SetTexture("myTexture", texture2);
-	material2->SetVec3("lightPos", lightPos);
-	material2->SetVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 
 	std::shared_ptr<Mesh> cubeMesh = std::make_shared<Mesh>(cubeVertices, 36);
 
@@ -223,8 +222,12 @@ int main() {
 
 	// Light
 	Node3D lightCube;
-	lightCube.transform.Translate(lightPos);
-	lightCube.AddComponent(std::make_unique<LightComponent>());
+	lightCube.transform.Translate(glm::vec3(1.0f, 2.0f, 1.0f));
+	std::unique_ptr<LightComponent> lightComponent = std::make_unique<LightComponent>();
+	lightComponent->SetColor(glm::vec3(1.0f, 0.8f, 1.0f));
+	lightComponent->SetIntensity(1.0f);
+	lightComponent->SetRadius(20.0f);
+	lightCube.AddComponent(std::move(lightComponent));
 
 	std::shared_ptr<Shader> lightShader = std::make_shared<Shader>("./defaultVertex.glsl", "./lightFragment.glsl");
 	std::shared_ptr<Material> lightMaterial = std::make_shared<Material>();
@@ -237,6 +240,7 @@ int main() {
 	lightCube.AddComponent(std::move(renderComponent));
 
 	glEnable(GL_DEPTH_TEST);
+	RenderingManager::Init();
 
 
 	float fpsCap = 144.0f;
@@ -247,8 +251,8 @@ int main() {
 		processInput(window);
 
 		lightCube.transform.SetPosition(glm::vec3(cos(glfwGetTime()*1.2f)*3.0f, sin(glfwGetTime()*1.5f)*3.0f, sin(glfwGetTime()*2.0f)*3.0f));
-		material1->SetVec3("lightPos", lightCube.transform.GetPosition());
-		material2->SetVec3("lightPos", lightCube.transform.GetPosition());
+		material1->SetVec3("viewPos", camera->GetPosition());
+		material2->SetVec3("viewPos", camera->GetPosition());
 
 		glClearColor(0.1, 0.1, 0.1, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

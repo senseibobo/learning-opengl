@@ -6,6 +6,9 @@ class Component
 public:
 	virtual ~Component() = default;
 	Component();
+
+	Node* GetOwner() const;
+
 protected:
 	Node* owner;
 };
