@@ -2,7 +2,6 @@
 
 in vec2 UV;
 in vec3 Normal;
-in vec3 Pos;
 out vec4 FragColor;
 
 uniform sampler2D myTexture;
