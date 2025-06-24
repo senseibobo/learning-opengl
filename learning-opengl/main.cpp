@@ -12,9 +12,11 @@
 #include "Mesh.h"
 #include "Node3D.h"
 #include "stb_image.h"
+#include "LightComponent.h"
 
 
 Camera* camera;
+bool firstMouse = true;
 double oldTime = 0.0f;
 double deltaTime = 0.0001f;
 double oldMouseX;
@@ -29,6 +31,12 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void mouse_callback(GLFWwindow*, double mouseX, double mouseY)
 {
+	if (firstMouse)
+	{
+		oldMouseX = mouseX;
+		oldMouseY = mouseY;
+		firstMouse = false;
+	}
 	camera->RotateYaw((mouseX - oldMouseX)*0.005f);
 	camera->RotatePitch(-(mouseY - oldMouseY)*0.005f);
 	oldMouseX = mouseX;
@@ -111,60 +119,49 @@ int main() {
 	};
 
 	float cubeVertices[] = {
-		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f, 0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f, 1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f, 1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f, 1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f, 0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f, 1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f, 1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f, 0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f, 0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f, 0.0f, 1.0f
-	}; 
-	glm::vec3 cubePositions[] = {
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(2.0f, 5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3(2.4f, -0.4f, -3.5f),
-		glm::vec3(-1.7f, 3.0f, -7.5f),
-		glm::vec3(1.3f, -2.0f, -2.5f),
-		glm::vec3(1.5f, 2.0f, -2.5f),
-		glm::vec3(1.5f, 0.2f, -1.5f),
-		glm::vec3(-1.3f, 1.0f, -1.5f)
+		 // positions         // normals          // UVs
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f
 	};
 
 	glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, -10.0f);
 	glm::vec3 cameraDirection = glm::normalize(glm::vec3(0.0f, 0.0f, 0.0f) - cameraPosition);
 	camera = new Camera(cameraPosition, cameraDirection);
-	std::shared_ptr<Shader> shader = std::make_shared<Shader>("./defaultVertex.glsl", "./defaultFragment.glsl");
+	std::shared_ptr<Shader> shader = std::make_shared<Shader>("./litVertex.glsl", "./litFragment.glsl");
 	RenderingManager::SetCamera(camera);
 
 
@@ -184,10 +181,10 @@ int main() {
 	std::shared_ptr<Material> material2 = std::make_shared<Material>();
 	material1->SetShader(shader);
 	material1->SetTexture("myTexture", texture1);
-	material1->SetTexture("otherTexture", texture1);
+	material1->SetVec3("lightColor", glm::vec3(1.0f, 0.5f, 0.3f));
 	material2->SetShader(shader);
 	material2->SetTexture("myTexture", texture2);
-	material2->SetTexture("otherTexture", texture2);
+	material2->SetVec3("lightColor", glm::vec3(1.0f, 0.5f, 0.3f));
 	Node3D cube1;
 	auto renderComponent1 = std::make_unique<RenderComponent>();
 	renderComponent1->SetMaterial(material1);
@@ -200,6 +197,21 @@ int main() {
 	cube2.AddComponent(std::move(renderComponent2));
 	cube2.transform.Translate(glm::vec3(2.0f, 0.0f, 0.0f));
 
+	// Light
+	Node3D lightCube;
+	lightCube.transform.Translate(glm::vec3(1.0f, 3.0f, 0.2f));
+	lightCube.AddComponent(std::make_unique<LightComponent>());
+
+	std::shared_ptr<Material> lightMaterial = std::make_shared<Material>();
+
+	std::shared_ptr<Shader> lightShader = std::make_shared<Shader>("./defaultVertex.glsl", "./lightFragment.glsl");
+	lightMaterial->SetShader(lightShader);
+
+	auto renderComponent = std::make_unique<RenderComponent>();
+	renderComponent->SetMaterial(lightMaterial);
+	renderComponent->SetMesh(cubeMesh);
+
+	lightCube.AddComponent(std::move(renderComponent));
 
 
 
@@ -215,7 +227,7 @@ int main() {
 		if (deltaTime < 1.0f / fpsCap) continue;
 		processInput(window);
 
-		glClearColor(0.1, 0.6, 0.2, 1.0);
+		glClearColor(0.1, 0.1, 0.1, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		RenderingManager::Render();

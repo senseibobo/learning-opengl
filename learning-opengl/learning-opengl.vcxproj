@@ -135,6 +135,7 @@
     <ClCompile Include="C:\libs\glad\src\glad.c" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="LightComponent.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -150,6 +151,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="LightComponent.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Node.h" />
@@ -164,6 +166,9 @@
   <ItemGroup>
     <None Include="defaultFragment.glsl" />
     <None Include="defaultVertex.glsl" />
+    <None Include="lightFragment.glsl" />
+    <None Include="litFragment.glsl" />
+    <None Include="litVertex.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

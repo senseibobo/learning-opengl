@@ -18,6 +18,11 @@ void Material::SetTexture(const std::string& uniformName, std::shared_ptr<Textur
 	texture2Ds[uniformName] = texture;
 }
 
+void Material::SetVec3(const std::string& uniformName, const glm::vec3& value)
+{
+	vec3Uniforms[uniformName] = value;
+}
+
 Shader* Material::GetShader()
 {
 	return shader.get();
@@ -32,4 +37,6 @@ void Material::Bind() const
 		shader->SetTexture(pair.first.c_str(), pair.second->ID, textureLocation);
 		textureLocation += 1;
 	}
+	for (std::pair<std::string, glm::vec3> pair : vec3Uniforms)
+		shader->SetVec3(pair.first.c_str(), pair.second);
 }

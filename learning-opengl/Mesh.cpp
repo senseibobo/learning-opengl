@@ -23,7 +23,7 @@ void Mesh::SetVAO(GLuint VAO)
 void Mesh::SetVertices(float* vertices, int count)
 {
 
-    GLsizei stride = 5 * sizeof(float);
+    GLsizei stride = 8 * sizeof(float);
     vertexCount = count;
 
     glGenVertexArrays(1, &VAO);
@@ -35,8 +35,10 @@ void Mesh::SetVertices(float* vertices, int count)
     glBufferData(GL_ARRAY_BUFFER, count*stride, vertices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3*sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3*sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(5*sizeof(float)));
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
 }

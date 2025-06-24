@@ -16,6 +16,7 @@ public:
 	void SetFloat(const char* uniformName, float value);
 	void SetInt(const char* uniformName, int value);
 	void SetMat4(const char* uniformName, const glm::mat4& value);
+	void SetVec3(const char* uniformName, const glm::vec3& value);
 	void SetTexture(const char* uniformName, GLuint textureID, int location);
 private:
 	static GLuint lastUsedProgram;

@@ -3,7 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
-class Camera
+class Camera // TODO: turn it into a Component
 {
 public:
 	Camera(const glm::vec3& position, const glm::vec3& direction);

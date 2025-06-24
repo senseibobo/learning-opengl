@@ -10,6 +10,7 @@ public:
 
 	void SetShader(std::shared_ptr<Shader> shader);
 	void SetTexture(const std::string& uniformName, std::shared_ptr<Texture2D> texture);
+	void SetVec3(const std::string& uniformName, const glm::vec3& value);
 
 	Shader* GetShader();
 	void Bind() const;
