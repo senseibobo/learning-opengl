@@ -9,6 +9,12 @@
 class Shader
 {
 public:
+	struct MaterialInfo
+	{
+		glm::vec3 albedo;
+		float roughness;
+	};
+
 	GLuint ID;
 	Shader(const char* vertexSourcePath, const char* fragmentSourcePath);
 	void Use();
