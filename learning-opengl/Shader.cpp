@@ -30,27 +30,39 @@ void Shader::checkProgramLinked(GLuint program)
 
 Shader::Shader(const char* vertexSourcePath, const char* fragmentSourcePath)
 {
-
+	std::string vertexBaseSource;
+	std::string fragmentBaseSource;
 	std::string vertexSource;
 	std::string fragmentSource;
 
+	std::ifstream vertexBaseFile;
+	std::ifstream fragmentBaseFile;
 	std::ifstream vertexFile;
 	std::ifstream fragmentFile;
 
+	std::stringstream vertexBaseStream;
+	std::stringstream fragmentBaseStream;
 	std::stringstream vertexStream;
 	std::stringstream fragmentStream;
 
+	vertexBaseFile.open("./vertexBase.glsl");
+	fragmentBaseFile.open("./fragmentBase.glsl");
 	vertexFile.open(vertexSourcePath);
 	fragmentFile.open(fragmentSourcePath);
 
+	vertexBaseStream << vertexBaseFile.rdbuf();
+	fragmentBaseStream << fragmentBaseFile.rdbuf();
 	vertexStream << vertexFile.rdbuf();
 	fragmentStream << fragmentFile.rdbuf();
 
+	vertexBaseFile.close();
+	fragmentBaseFile.close();
 	vertexFile.close();
 	fragmentFile.close();
-	
-	vertexSource = vertexStream.str();
-	fragmentSource = fragmentStream.str();
+
+
+	vertexSource = vertexBaseStream.str() + vertexStream.str();
+	fragmentSource = fragmentBaseStream.str() + fragmentStream.str();
 
 	const char* vertexSourceCstr = vertexSource.c_str();
 	const char* fragmentSourceCstr = fragmentSource.c_str();

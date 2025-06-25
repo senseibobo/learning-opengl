@@ -166,9 +166,11 @@
   <ItemGroup>
     <None Include="defaultFragment.glsl" />
     <None Include="defaultVertex.glsl" />
+    <None Include="fragmentBase.glsl" />
     <None Include="lightFragment.glsl" />
     <None Include="litFragment.glsl" />
     <None Include="litVertex.glsl" />
+    <None Include="vertexBase.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

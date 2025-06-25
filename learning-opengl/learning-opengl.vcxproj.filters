@@ -130,5 +130,11 @@
     <None Include="lightFragment.glsl">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="vertexBase.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="fragmentBase.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
