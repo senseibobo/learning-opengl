@@ -9,18 +9,25 @@ class RenderComponent;
 class RenderingManager
 {
 public:
-	static struct alignas(16) Light {
-		glm::vec4 position; // 16
-		glm::vec4 color; // 16
-		float radius; // 4
-		float intensity; // 4
-		float padding[2]; // 8
+	struct alignas(16) Light {
+		glm::vec4 position;
+		glm::vec4 color;
+		glm::vec4 direction;
+		glm::vec4 params;
 	};
-	static struct alignas(16) LightBlock {
-		int lightCount;
-		int padding[3];
-		Light lights[32];
+
+	struct alignas(16) LightBlock {
+		alignas(16) int lightCount;
+		alignas(16) Light lights[16];
 	};
+
+	struct alignas(16) CameraBlock {
+		glm::vec4 position;
+		glm::vec4 direction;
+		glm::mat4 view;
+		glm::mat4 projection;
+	};
+
 	static struct RenderCommand {
 		uint64_t sortKey;
 		Shader* shader;
@@ -39,8 +46,13 @@ public:
 
 private:
 	static GLuint lightUBO;
+	static GLuint cameraUBO;
 	static Camera* camera;
 	static std::vector<RenderComponent*> renderComponents;
 	static std::vector<LightComponent*> lightComponents;
+
+	static void uploadLightData();
+	static void uploadCameraData();
+	static std::vector<RenderCommand> getRenderCommands();
 };
 

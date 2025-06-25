@@ -10,8 +10,13 @@ out vec3 Normal;
 
 uniform float time;
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+
+uniform Camera {
+	vec4 viewPos;
+	vec4 viewDir;
+	mat4 view;
+	mat4 projection;
+};
 
 void main()
 {

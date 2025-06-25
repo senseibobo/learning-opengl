@@ -75,11 +75,11 @@ Shader::Shader(const char* vertexSourcePath, const char* fragmentSourcePath)
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
-	GLuint blockIndex = glGetUniformBlockIndex(ID, "LightBlock");
-	if (blockIndex != GL_INVALID_INDEX) {
-		GLuint bindingPoint = 1;
-		glUniformBlockBinding(ID, blockIndex, bindingPoint);
-	}
+	GLuint blockIndex = glGetUniformBlockIndex(ID, "Camera");
+	glUniformBlockBinding(ID, blockIndex, 1);
+	blockIndex = glGetUniformBlockIndex(ID, "Lights");
+	glUniformBlockBinding(ID, blockIndex, 2);
+
 
 
 	checkProgramLinked(ID);

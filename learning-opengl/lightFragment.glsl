@@ -2,22 +2,24 @@
 
 out vec4 FragColor;
 
-
 struct Light {
-    vec4 position;
-    vec4 color;
-    float radius;
-    float intensity;
-    vec2 padding;
+    vec4 position; // w=1-point, w=0-directional
+    vec4 color;    // rgb and a-intensity
+    vec4 direction;
+    vec4 params;    // x-type, y-radius, z-, w- something else
 };
 
-layout(std140) uniform LightBlock {
-    int lightCount;
-    int padding[3];
-    Light lights[32];
+uniform Lights {
+	int lightCount;
+	Light lights[16];
 };
 
-
+uniform Camera {
+	vec4 viewPos;
+	vec4 viewDir;
+	mat4 view;
+	mat4 projection;
+};
 
 void main()
 {

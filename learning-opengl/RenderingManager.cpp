@@ -6,15 +6,22 @@
 std::vector<RenderComponent*> RenderingManager::renderComponents = std::vector<RenderComponent*>();
 std::vector<LightComponent*> RenderingManager::lightComponents = std::vector<LightComponent*>();
 GLuint RenderingManager::lightUBO = 0;
+GLuint RenderingManager::cameraUBO = 0;
 Camera* RenderingManager::camera = nullptr;
 
 void RenderingManager::Init()
 {
+	glGenBuffers(1, &cameraUBO);
+	glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraBlock), nullptr, GL_DYNAMIC_DRAW);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 1, cameraUBO);
+
 	glGenBuffers(1, &lightUBO);
 	glBindBuffer(GL_UNIFORM_BUFFER, lightUBO);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(LightBlock), nullptr, GL_DYNAMIC_DRAW);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 2, lightUBO);
+	
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
 }
 
 void RenderingManager::SetCamera(Camera* newCamera)
@@ -22,7 +29,8 @@ void RenderingManager::SetCamera(Camera* newCamera)
 	camera = newCamera;
 }
 
-void RenderingManager::Render()
+
+void RenderingManager::uploadLightData()
 {
 	LightBlock lightBlock = {};
 	lightBlock.lightCount = static_cast<int>(lightComponents.size());
@@ -36,19 +44,20 @@ void RenderingManager::Render()
 
 		const Transform* lightTransform = &(node3d->transform);
 		Light light = {};
-		light.position = glm::vec4(lightTransform->GetPosition(), 1.0f);
-		light.color = glm::vec4(lightComponent->GetColor(), 1.0f);
-		light.intensity = lightComponent->GetIntensity();
-		light.radius = lightComponent->GetRadius();
-		light.padding[0] = 0.0f;
-		light.padding[1] = 0.0f;
+		light.position = glm::vec4(lightTransform->GetPosition(), 0.0f);
+		light.color = glm::vec4(lightComponent->GetColor(), lightComponent->GetIntensity());
+		light.params = glm::vec4(1.0f, lightComponent->GetRadius(), 0.0f, 0.0f);
 		lightBlock.lights[i] = light;
 		i++;
-		if (i == 32) break;
+		if (i == 16) break;
 	}
 	glBindBuffer(GL_UNIFORM_BUFFER, lightUBO);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(LightBlock), &lightBlock);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
 
+std::vector<RenderingManager::RenderCommand> RenderingManager::getRenderCommands()
+{
 	std::vector<RenderCommand> renderCommands;
 	for (RenderComponent* renderComponent : renderComponents)
 	{
@@ -66,18 +75,35 @@ void RenderingManager::Render()
 		return rc1.sortKey > rc2.sortKey;
 		};
 	std::sort(begin, end, compareFunc);
+	return renderCommands;
+}
+
+
+void RenderingManager::uploadCameraData()
+{
+	CameraBlock cameraBlock;
+	cameraBlock.position = glm::vec4(camera->GetPosition(),1.0f);
+	cameraBlock.direction = glm::vec4(camera->GetForwardVector(), 0.0f);
+	cameraBlock.projection = camera->GetProjectionMatrix();
+	cameraBlock.view = camera->GetViewMatrix();
+	glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(CameraBlock), &cameraBlock);
+}
+
+
+void RenderingManager::Render()
+{
+	uploadLightData();
+	uploadCameraData();
+
 	Shader* lastShader = nullptr;
 	Material* lastMaterial = nullptr;
-	for (const RenderCommand& renderCommand : renderCommands)
+	for (const RenderCommand& renderCommand : getRenderCommands())
 	{
 		if (renderCommand.shader != lastShader)
 		{
 			renderCommand.shader->Use();
-			renderCommand.shader->SetMat4("projection", camera->GetProjectionMatrix());
-			renderCommand.shader->SetMat4("view", camera->GetViewMatrix());
 			lastShader = renderCommand.shader; 
-			glBindBufferBase(GL_UNIFORM_BUFFER, 1, lightUBO);
-
 		}
 		if (renderCommand.material != lastMaterial)
 		{

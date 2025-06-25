@@ -7,24 +7,51 @@ in vec3 FragPos;
 out vec4 FragColor;
 
 uniform sampler2D myTexture;
-uniform vec3 viewPos;
-
 
 struct Light {
-    vec4 position;
-    vec4 color;
-    float radius;
-    float intensity;
-    float padding[2];
+    vec4 position; // w=1-point, w=0-directional
+    vec4 color;    // rgb and a-intensity
+    vec4 direction;
+    vec4 params;    // x-type, y-radius, z-, w- something else
 };
 
-layout(std140) uniform LightBlock {
-    int lightCount;
-    int padding[3];
-    Light lights[32];
+uniform Lights {
+	int lightCount;
+	Light lights[16];
 };
 
+uniform Camera {
+	vec4 viewPos;
+	vec4 viewDir;
+	mat4 view;
+	mat4 projection;
+};
 
+vec3 calculateLighting(Light light)
+{
+	float radius = light.params[1];
+
+	vec3 posDifference = vec3(light.position) - FragPos;
+	vec3 lightDirection = normalize(posDifference);
+	vec3 viewDirection = normalize(viewPos.xyz - FragPos);
+	
+	// ambient
+	vec3 ambient = light.color.rgb * 0.05;
+
+	// diffuse
+	float diff = max(dot(lightDirection, Normal),0.0);
+	vec3 diffuse = light.color.rgb * diff;
+
+	// specular
+	float spec = pow(max(dot(viewDirection, reflect(-lightDirection, Normal)),0.0),32.0);
+	vec3 specular = light.color.rgb * spec;
+
+	// radius stuff
+	float dist = length(posDifference);
+	float attenuation = max(1.0-dist/radius,0.0);
+
+	return (ambient+diffuse+specular) * light.color.a * attenuation;
+}
 
 
 void main()
@@ -35,23 +62,9 @@ void main()
 	vec3 resultColor = vec3(0.0);
 	for(int i = 0; i < lightCount; i++) 
 	{
-		Light light = lights[i];
-
-		vec3 posDifference = vec3(light.position) - FragPos;
-		vec3 lightDirection = normalize(posDifference);
-		vec3 viewDirection = normalize(viewPos - FragPos);
-		float diff = max(dot(lightDirection, Normal),0.0);
-		vec3 ambient = light.color.rgb * 1000.0;
-		vec3 diffuse = light.color.rgb * diff;
-		float spec = pow(max(dot(viewDirection, reflect(-lightDirection, Normal)),0.0),32.0);
-		vec3 specular = light.color.rgb * spec;
-
-		float dist = length(posDifference);
-		float attenuation = max(1.0-dist/light.radius,0.0);
-		resultColor += ambient;
+		resultColor += calculateLighting(lights[i]);
 	}
 	
 	resultColor *= textureColor;
-	resultColor = lights[0].color.rgb;
 	FragColor = vec4(resultColor,1.0);
 }
