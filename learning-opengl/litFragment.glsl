@@ -1,8 +1,10 @@
-uniform sampler2D myTexture;
-
 struct MaterialInfo {
 	vec3 albedo;
 	float roughness;
+	float specular;
+	sampler2D albedoMap;
+	sampler2D roughnessMap;
+	sampler2D specularMap;
 };
 
 
@@ -25,8 +27,10 @@ vec3 calculateLighting(Light light)
 	vec3 diffuse = light.color.rgb * diff;
 
 	// specular
-	float shininess = 1.0/(0.01+0.99*material.roughness);
+	float roughness = material.roughness * texture(material.roughnessMap, UV).r;
+	float shininess = 1.0/(0.01+0.99*roughness);
 	float spec = pow(max(dot(viewDirection, reflect(-lightDirection, Normal)),0.0),shininess);
+	spec *= material.specular * texture(material.specularMap, UV).r;
 	vec3 specular = light.color.rgb * spec;
 
 	// radius stuff
@@ -40,7 +44,6 @@ vec3 calculateLighting(Light light)
 void main()
 {
 	float ambientStrength = 0.1;
-	vec3 textureColor = texture(myTexture, UV).rgb * material.albedo;
 
 	vec3 resultColor = vec3(0.0);
 	for(int i = 0; i < lightCount; i++) 
@@ -48,6 +51,6 @@ void main()
 		resultColor += calculateLighting(lights[i]);
 	}
 	
-	resultColor *= textureColor;
+	resultColor *= material.albedo * texture(material.albedoMap, UV).rgb;
 	FragColor = vec4(resultColor,1.0);
 }

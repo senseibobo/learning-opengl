@@ -4,7 +4,7 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& direction)
 {
 	this->position = position;
 	this->fov = 60.0f;
-	SetSpeed(10.0f);
+	SetSpeed(3.0f);
 	SetDirection(direction);
 }
 

@@ -85,6 +85,7 @@ int main() {
 	stbi_set_flip_vertically_on_load(true);
 	glfwInit();
 
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -109,6 +110,7 @@ int main() {
 
 	glViewport(0, 0, 800, 600);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	Texture2D::InitWhiteFallbackTexture();
 
 	const GLubyte* version = glGetString(GL_VERSION);
 	const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
@@ -187,23 +189,20 @@ int main() {
 	RenderingManager::SetCamera(camera);
 
 
-	int width, height, nrChannels;
-	unsigned char* imageData = stbi_load("./texture.png", &width, &height, &nrChannels, 0);
-
-	std::shared_ptr<Texture2D> texture1 = std::make_shared<Texture2D>("./texture.png", GL_RGBA);
-	std::shared_ptr<Texture2D> texture2 = std::make_shared<Texture2D>("./container.jpg", GL_RGB);
-	texture1->SetWrap(GL_CLAMP_TO_EDGE);
-	texture2->SetWrap(GL_REPEAT);
+	std::shared_ptr<Texture2D> junoKilometarTexture = std::make_shared<Texture2D>("./texture.png", GL_RGBA);
+	std::shared_ptr<Texture2D> containerTexture = std::make_shared<Texture2D>("./container.jpg", GL_RGB);
+	junoKilometarTexture->SetWrap(GL_CLAMP_TO_EDGE);
+	containerTexture->SetWrap(GL_REPEAT);
 
 	std::shared_ptr<Shader> shader = std::make_shared<Shader>("./litVertex.glsl", "./litFragment.glsl");
 	std::shared_ptr<Material> material1 = std::make_shared<Material>();
 	std::shared_ptr<Material> material2 = std::make_shared<Material>();
 
 	material1->SetShader(shader);
-	material1->SetTexture("myTexture", texture1);
-
+	material1->SetAlbedoMap(junoKilometarTexture);
+	material1->SetSpecularMap(containerTexture);
+	material1->SetRoughnessMap(containerTexture);
 	material2->SetShader(shader);
-	material2->SetTexture("myTexture", texture2);
 
 	std::shared_ptr<Mesh> cubeMesh = std::make_shared<Mesh>(cubeVertices, 36);
 
@@ -227,11 +226,11 @@ int main() {
 	lightComponent->SetColor(glm::vec3(1.0f, 0.8f, 1.0f));
 	lightComponent->SetIntensity(1.0f);
 	lightComponent->SetRadius(20.0f);
-	lightCube.AddComponent(std::move(lightComponent));
-
 	std::shared_ptr<Shader> lightShader = std::make_shared<Shader>("./defaultVertex.glsl", "./lightFragment.glsl");
 	std::shared_ptr<Material> lightMaterial = std::make_shared<Material>();
 	lightMaterial->SetShader(lightShader);
+	lightMaterial->SetVec3("color", lightComponent->GetColor());
+	lightCube.AddComponent(std::move(lightComponent));
 
 	auto renderComponent = std::make_unique<RenderComponent>();
 	renderComponent->SetMaterial(lightMaterial);
@@ -250,9 +249,7 @@ int main() {
 		if (deltaTime < 1.0f / fpsCap) continue;
 		processInput(window);
 
-		lightCube.transform.SetPosition(glm::vec3(cos(glfwGetTime()*1.2f)*3.0f, sin(glfwGetTime()*1.5f)*3.0f, sin(glfwGetTime()*2.0f)*3.0f));
-		material1->SetVec3("viewPos", camera->GetPosition());
-		material2->SetVec3("viewPos", camera->GetPosition());
+		//lightCube.transform.SetPosition(glm::vec3(cos(glfwGetTime()*1.2f)*3.0f, sin(glfwGetTime()*1.5f)*3.0f, sin(glfwGetTime()*2.0f)*3.0f));
 
 		glClearColor(0.1, 0.1, 0.1, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -6,13 +6,18 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "Texture2D.h"
 class Shader
 {
 public:
 	struct MaterialInfo
 	{
 		glm::vec3 albedo;
+		std::shared_ptr<Texture2D> albedoMap;
 		float roughness;
+		std::shared_ptr<Texture2D> roughnessMap;
+		float specular;
+		std::shared_ptr<Texture2D> specularMap;
 	};
 
 	GLuint ID;
