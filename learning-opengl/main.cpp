@@ -12,7 +12,8 @@
 #include "Mesh.h"
 #include "Node3D.h"
 #include "stb_image.h"
-#include "LightComponent.h"
+#include "SpotLightComponent.h"
+#include "DirectionalLightComponent.h"
 
 
 Camera* camera;
@@ -220,23 +221,33 @@ int main() {
 	cube2.transform.Translate(glm::vec3(2.0f, 0.0f, 0.0f));
 
 	// Light
-	Node3D lightCube;
-	lightCube.transform.Translate(glm::vec3(1.0f, 2.0f, 1.0f));
-	std::unique_ptr<LightComponent> lightComponent = std::make_unique<LightComponent>();
+	Node3D spotLightCube;
+	spotLightCube.transform.SetEuler(glm::vec3(1.51f, 0.5f, 0.0f));
+	spotLightCube.transform.Translate(glm::vec3(1.0f, 2.0f, 1.0f));
+	std::unique_ptr<SpotLightComponent> lightComponent = std::make_unique<SpotLightComponent>();
 	lightComponent->SetColor(glm::vec3(1.0f, 0.8f, 1.0f));
 	lightComponent->SetIntensity(1.0f);
-	lightComponent->SetRadius(20.0f);
+	lightComponent->SetInnerAngle(0.5f);
+	lightComponent->SetOuterAngle(0.7f);
 	std::shared_ptr<Shader> lightShader = std::make_shared<Shader>("./defaultVertex.glsl", "./lightFragment.glsl");
 	std::shared_ptr<Material> lightMaterial = std::make_shared<Material>();
 	lightMaterial->SetShader(lightShader);
 	lightMaterial->SetVec3("color", lightComponent->GetColor());
-	lightCube.AddComponent(std::move(lightComponent));
+	spotLightCube.AddComponent(std::move(lightComponent));
 
 	auto renderComponent = std::make_unique<RenderComponent>();
 	renderComponent->SetMaterial(lightMaterial);
 	renderComponent->SetMesh(cubeMesh);
 
-	lightCube.AddComponent(std::move(renderComponent));
+	spotLightCube.AddComponent(std::move(renderComponent));
+
+	Node3D directionalLightNode;
+	directionalLightNode.transform.SetEuler(glm::vec3(0.3f, 0.2f, 0.0f));
+	auto directionalLightComponent = std::make_unique<DirectionalLightComponent>();
+	directionalLightComponent->SetColor(glm::vec3(1.0f, 1.0f, 0.0f));
+	directionalLightComponent->SetIntensity(0.4f);
+	directionalLightNode.AddComponent(std::move(directionalLightComponent));
+
 
 	glEnable(GL_DEPTH_TEST);
 	RenderingManager::Init();
@@ -249,7 +260,8 @@ int main() {
 		if (deltaTime < 1.0f / fpsCap) continue;
 		processInput(window);
 
-		//lightCube.transform.SetPosition(glm::vec3(cos(glfwGetTime()*1.2f)*3.0f, sin(glfwGetTime()*1.5f)*3.0f, sin(glfwGetTime()*2.0f)*3.0f));
+		spotLightCube.transform.SetPosition(glm::vec3(cos(glfwGetTime()*1.2f)*3.0f, sin(glfwGetTime()*1.5f)*3.0f, sin(glfwGetTime()*2.0f)*3.0f));
+		spotLightCube.transform.LookAt(glm::vec3(0.0f, 0.0f, 0.0f));
 
 		glClearColor(0.1, 0.1, 0.1, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

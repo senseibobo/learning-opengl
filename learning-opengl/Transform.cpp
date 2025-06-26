@@ -59,6 +59,12 @@ void Transform::SetScale(const glm::vec3& scale)
 	updateMatrix();
 }
 
+void Transform::LookAt(const glm::vec3& targetPosition)
+{
+	glm::mat4 look = glm::lookAt(position, targetPosition, glm::vec3(0.0f, 1.0f, 0.0f));
+	quaternion = glm::quat_cast(glm::inverse(look));
+}
+
 void Transform::Translate(const glm::vec3& translation)
 {
 	SetPosition(GetPosition() + translation);
@@ -89,10 +95,29 @@ glm::mat4 Transform::GetMatrix() const
 	return matrix;
 }
 
+glm::vec3 Transform::GetForwardVector() const
+{
+	return forward;
+}
+
+glm::vec3 Transform::GetRightVector() const
+{
+	return right;
+}
+
+glm::vec3 Transform::GetUpVector() const
+{
+	return up;
+}
+
 void Transform::updateMatrix()
 {
 	matrix = glm::mat4(1.0f);
 	matrix = glm::translate(matrix, position);
-	matrix = glm::toMat4(quaternion) * matrix;
+	matrix = matrix * glm::toMat4(quaternion);
 	matrix = glm::scale(matrix, scale);
+
+	forward = glm::rotate(quaternion, glm::vec3(0.0f, 0.0f, 1.0f));
+	right = glm::rotate(quaternion, glm::vec3(1.0f, 0.0f, 0.0f));
+	up = glm::rotate(quaternion, glm::vec3(0.0f, 1.0f, 0.0f));
 }

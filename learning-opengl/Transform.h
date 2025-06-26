@@ -16,6 +16,7 @@ public:
 	void SetEuler(const glm::vec3& euler);
 	void SetQuaternion(const glm::quat& quaternion);
 	void SetScale(const glm::vec3& scale);
+	void LookAt(const glm::vec3& targetPosition);
 
 	void Translate(const glm::vec3& translation);
 
@@ -25,6 +26,10 @@ public:
 	glm::quat GetQuaternion() const;
 	glm::mat4 GetMatrix() const;
 
+	glm::vec3 GetForwardVector() const;
+	glm::vec3 GetRightVector() const;
+	glm::vec3 GetUpVector() const;
+
 private:
 	void updateMatrix();
 
@@ -33,5 +38,8 @@ private:
 	glm::vec3 euler;
 	glm::vec3 scale;
 	glm::mat4 matrix;
+	glm::vec3 forward;
+	glm::vec3 right;
+	glm::vec3 up;
 };
 

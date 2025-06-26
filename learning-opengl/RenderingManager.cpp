@@ -38,16 +38,7 @@ void RenderingManager::uploadLightData()
 	int i = 0;
 	for (LightComponent* lightComponent : lightComponents)
 	{
-		Node* owner = lightComponent->GetOwner();
-		Node3D* node3d = dynamic_cast<Node3D*>(owner);
-		if (!node3d) continue;
-
-		const Transform* lightTransform = &(node3d->transform);
-		Light light = {};
-		light.position = glm::vec4(lightTransform->GetPosition(), 0.0f);
-		light.color = glm::vec4(lightComponent->GetColor(), lightComponent->GetIntensity());
-		light.params = glm::vec4(1.0f, lightComponent->GetRadius(), 0.0f, 0.0f);
-		lightBlock.lights[i] = light;
+		lightBlock.lights[i] = lightComponent->GetLightStruct();
 		i++;
 		if (i == 16) break;
 	}

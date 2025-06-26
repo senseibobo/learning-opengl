@@ -135,15 +135,18 @@
     <ClCompile Include="C:\libs\glad\src\glad.c" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="DirectionalLightComponent.cpp" />
     <ClCompile Include="LightComponent.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Node3D.cpp" />
+    <ClCompile Include="PointLightComponent.cpp" />
     <ClCompile Include="RenderComponent.cpp" />
     <ClCompile Include="RenderingManager.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="SpotLightComponent.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="Transform.cpp" />
@@ -151,14 +154,17 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="DirectionalLightComponent.h" />
     <ClInclude Include="LightComponent.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Node3D.h" />
+    <ClInclude Include="PointLightComponent.h" />
     <ClInclude Include="RenderComponent.h" />
     <ClInclude Include="RenderingManager.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="SpotLightComponent.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="Transform.h" />

@@ -6,12 +6,15 @@ in vec3 FragPos;
 
 out vec4 FragColor;
 
+#define TYPE_POINT 0.0
+#define TYPE_DIRECTIONAL 1.0
+#define TYPE_SPOT 2.0
 
 struct Light {
     vec4 position; // w=1-point, w=0-directional
     vec4 color;    // rgb and a-intensity
     vec4 direction;
-    vec4 params;    // x-type, y-radius, z-, w- something else
+    vec4 params;    // x-type
 };
 
 uniform Lights {

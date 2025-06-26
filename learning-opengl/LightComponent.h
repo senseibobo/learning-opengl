@@ -12,15 +12,14 @@ public:
 
     glm::vec3 GetColor() const;
     float GetIntensity() const;
-    float GetRadius() const;
 
     void SetColor(const glm::vec3& color);
     void SetIntensity(float intensity);
-    void SetRadius(float radius);
 
-private:
+    virtual RenderingManager::Light GetLightStruct();
+
+protected:
     glm::vec3 color;
     float intensity;
-    float radius;
 };
 
