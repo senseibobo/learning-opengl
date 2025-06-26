@@ -1,8 +1,10 @@
 #version 330 core
 
+in vec3 FragPos;
 in vec3 Normal;
 in vec2 UV;
-in vec3 FragPos;
+in vec3 Tangent;
+in vec3 Bitangent;
 
 out vec4 FragColor;
 

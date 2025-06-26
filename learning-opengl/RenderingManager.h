@@ -3,7 +3,7 @@
 #include <vector>
 #include "Camera.h"
 #include "Material.h"
-#include "Mesh.h"
+#include "Model.h"
 class LightComponent;
 class RenderComponent;
 class RenderingManager
@@ -48,11 +48,13 @@ private:
 	static GLuint lightUBO;
 	static GLuint cameraUBO;
 	static Camera* camera;
+	static std::vector<RenderCommand> renderCommands;
 	static std::vector<RenderComponent*> renderComponents;
 	static std::vector<LightComponent*> lightComponents;
 
 	static void uploadLightData();
 	static void uploadCameraData();
-	static std::vector<RenderCommand> getRenderCommands();
+	static void processModelNode(Model::Node* modelNode, const glm::mat4& parentTransform, Material* material);
+	static const std::vector<RenderCommand>& getRenderCommands();
 };
 

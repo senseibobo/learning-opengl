@@ -1,6 +1,6 @@
 #pragma once
 #include "Node3D.h"
-#include "Mesh.h"
+#include "Model.h"
 #include "Camera.h"
 #include "Material.h"
 #include "Component.h"
@@ -12,18 +12,18 @@ public:
     ~RenderComponent() override = default;
     RenderComponent() : Component() 
     {
-        mesh = nullptr;
+        model = nullptr;
         material = nullptr;
         RenderingManager::AddRenderComponent(this);
     };
-    void SetMesh(std::shared_ptr<Mesh> mesh);
+    void SetModel(std::shared_ptr<Model> model);
     void SetMaterial(std::shared_ptr<Material> material);
 
     Material* GetMaterial();
-    Mesh* GetMesh();
+    std::shared_ptr<Model> GetModel();
     glm::mat4 GetTransformMatrix() const;
 private:
-    std::shared_ptr<Mesh> mesh;
+    std::shared_ptr<Model> model;
     std::shared_ptr<Material> material;
 };
 

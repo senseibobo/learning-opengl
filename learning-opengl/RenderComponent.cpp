@@ -2,9 +2,9 @@
 
 
 
-void RenderComponent::SetMesh(std::shared_ptr<Mesh> mesh)
+void RenderComponent::SetModel(std::shared_ptr<Model> model)
 {
-	this->mesh = mesh;
+	this->model = model;
 }
 
 void RenderComponent::SetMaterial(std::shared_ptr<Material> material)
@@ -17,9 +17,9 @@ Material* RenderComponent::GetMaterial()
 	return material.get();
 }
 
-Mesh* RenderComponent::GetMesh()
+std::shared_ptr<Model> RenderComponent::GetModel()
 {
-	return mesh.get();
+	return model;
 }
 
 glm::mat4 RenderComponent::GetTransformMatrix() const

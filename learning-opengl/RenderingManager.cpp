@@ -5,6 +5,7 @@
 
 std::vector<RenderComponent*> RenderingManager::renderComponents = std::vector<RenderComponent*>();
 std::vector<LightComponent*> RenderingManager::lightComponents = std::vector<LightComponent*>();
+std::vector<RenderingManager::RenderCommand> RenderingManager::renderCommands = std::vector<RenderingManager::RenderCommand>();
 GLuint RenderingManager::lightUBO = 0;
 GLuint RenderingManager::cameraUBO = 0;
 Camera* RenderingManager::camera = nullptr;
@@ -47,18 +48,39 @@ void RenderingManager::uploadLightData()
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-std::vector<RenderingManager::RenderCommand> RenderingManager::getRenderCommands()
+void RenderingManager::processModelNode(Model::Node* modelNode, const glm::mat4& parentTransform, Material* material)
 {
-	std::vector<RenderCommand> renderCommands;
-	for (RenderComponent* renderComponent : renderComponents)
+	
+	if (modelNode == nullptr)
+	{
+		std::cout << "Breaking the point\n";
+		return;
+	}
+
+	glm::mat4 currentTransform = parentTransform * modelNode->localTransform;
+	for (std::shared_ptr<Mesh> mesh : modelNode->meshes)
 	{
 		RenderCommand renderCommand;
-		renderCommand.material = renderComponent->GetMaterial();
-		renderCommand.shader = renderComponent->GetMaterial()->GetShader();
-		renderCommand.mesh = renderComponent->GetMesh();
-		renderCommand.transform = renderComponent->GetTransformMatrix();
+		renderCommand.material = material;
+		renderCommand.mesh = mesh.get();
+		renderCommand.shader = material->GetShader();
+		renderCommand.transform = currentTransform;
 		renderCommand.sortKey = (uint64_t(renderCommand.shader->ID) << 32 | uint64_t(renderCommand.material->ID));
 		renderCommands.push_back(renderCommand);
+	}
+
+	for (std::unique_ptr<Model::Node>& child : modelNode->children)
+	{
+		processModelNode(child.get(), currentTransform, material);
+	}
+}
+
+const std::vector<RenderingManager::RenderCommand>& RenderingManager::getRenderCommands()
+{
+	renderCommands.clear();
+	for (RenderComponent* renderComponent : renderComponents)
+	{
+		processModelNode(renderComponent->GetModel()->GetRootNode(), renderComponent->GetTransformMatrix(), renderComponent->GetMaterial());
 	}
 	auto begin = renderCommands.begin();
 	auto end = renderCommands.end();
@@ -105,7 +127,7 @@ void RenderingManager::Render()
 		renderCommand.shader->SetMat4("model", renderCommand.transform);
 		
 		glBindVertexArray(renderCommand.mesh->GetVAO());
-		glDrawArrays(GL_TRIANGLES, 0, renderCommand.mesh->GetVertexCount());
+		glDrawElements(GL_TRIANGLES, renderCommand.mesh->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
 	}
 }
 

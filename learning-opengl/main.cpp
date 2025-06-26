@@ -14,6 +14,7 @@
 #include "stb_image.h"
 #include "SpotLightComponent.h"
 #include "DirectionalLightComponent.h"
+#include "assimp/Importer.hpp"
 
 
 Camera* camera;
@@ -205,18 +206,17 @@ int main() {
 	material1->SetRoughnessMap(containerTexture);
 	material2->SetShader(shader);
 
-	std::shared_ptr<Mesh> cubeMesh = std::make_shared<Mesh>(cubeVertices, 36);
 
 	Node3D cube1;
 	auto renderComponent1 = std::make_unique<RenderComponent>();
 	renderComponent1->SetMaterial(material1);
-	renderComponent1->SetMesh(cubeMesh);
+	renderComponent1->SetModel(Model::Load("./model.glb"));
 	cube1.AddComponent(std::move(renderComponent1));
 
 	Node3D cube2;
 	auto renderComponent2 = std::make_unique<RenderComponent>();
 	renderComponent2->SetMaterial(material2);
-	renderComponent2->SetMesh(cubeMesh);
+	renderComponent2->SetModel(Model::Load("./model.glb"));
 	cube2.AddComponent(std::move(renderComponent2));
 	cube2.transform.Translate(glm::vec3(2.0f, 0.0f, 0.0f));
 
@@ -237,7 +237,7 @@ int main() {
 
 	auto renderComponent = std::make_unique<RenderComponent>();
 	renderComponent->SetMaterial(lightMaterial);
-	renderComponent->SetMesh(cubeMesh);
+	renderComponent->SetModel(Model::Load("./model.glb"));
 
 	spotLightCube.AddComponent(std::move(renderComponent));
 
