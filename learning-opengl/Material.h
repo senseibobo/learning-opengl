@@ -20,6 +20,11 @@ public:
 	void SetAlbedoMap(std::shared_ptr<Texture2D> albedoMap);
 	void SetRoughnessMap(std::shared_ptr<Texture2D> roughnessMap);
 	void SetSpecularMap(std::shared_ptr<Texture2D> specularMap);
+	void SetDepthTestFunc(GLenum depthTestFunc);
+
+	static void InitDefaultMaterial();
+
+	static std::shared_ptr<Material> GetDefaultMaterial();
 
 	Shader* GetShader();
 	void Bind();
@@ -27,11 +32,14 @@ public:
 	uint32_t ID;
 private:
 	static uint32_t currentMaterialIndex;
+	//GLenum cullMode;
+	GLenum depthTestFunc;
 	std::shared_ptr<Shader> shader;
 	std::unordered_map<std::string, std::shared_ptr<Texture2D>> texture2Ds;
 	std::unordered_map<std::string, float> floatUniforms;
 	std::unordered_map<std::string, glm::vec3> vec3Uniforms;
 
 	Shader::MaterialInfo materialInfo;
+	static std::shared_ptr<Material> defaultMaterial;
 };
 

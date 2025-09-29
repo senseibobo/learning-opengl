@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+
 class Node;
 class Component
 {
@@ -7,7 +9,12 @@ public:
 	virtual ~Component() = default;
 	Component();
 
+
 	Node* GetOwner() const;
+	virtual void Process(float delta) {}
+	virtual void PhysicsProcess(float delta) {}
+
+	void QueueFree();
 
 protected:
 	Node* owner;

@@ -2,12 +2,14 @@
 
 
 uint32_t Material::currentMaterialIndex = 0;
+std::shared_ptr<Material> Material::defaultMaterial = nullptr;
 
 Material::Material()
 {
 	materialInfo.albedo = glm::vec3(1.0f, 1.0f, 1.0f);
 	materialInfo.roughness = 0.2f;
 	materialInfo.specular = 1.0f;
+	depthTestFunc = GL_LESS;
 	ID = ++currentMaterialIndex;
 }
 
@@ -62,6 +64,23 @@ void Material::SetSpecularMap(std::shared_ptr<Texture2D> specularMap)
 	materialInfo.specularMap = specularMap;
 }
 
+void Material::SetDepthTestFunc(GLenum depthTestFunc)
+{
+	this->depthTestFunc = depthTestFunc;
+}
+
+void Material::InitDefaultMaterial()
+{
+	defaultMaterial = std::make_shared<Material>();
+	std::shared_ptr<Shader> shader = std::make_shared<Shader>("./litVertex.glsl", "./litFragment.glsl");
+	defaultMaterial->SetShader(shader);
+}
+
+std::shared_ptr<Material> Material::GetDefaultMaterial()
+{
+	return defaultMaterial;
+}
+
 Shader* Material::GetShader()
 {
 	return shader.get();
@@ -70,6 +89,8 @@ Shader* Material::GetShader()
 void Material::Bind()
 {
 	shader->Use();
+
+	glDepthFunc(depthTestFunc);
 	
 	// set material info
 	shader->SetVec3("material.albedo", materialInfo.albedo);

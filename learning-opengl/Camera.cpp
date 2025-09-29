@@ -1,11 +1,15 @@
 #include "Camera.h"
 
+Camera* Camera::currentCamera = nullptr;
+
+
 Camera::Camera(const glm::vec3& position, const glm::vec3& direction)
 {
 	this->position = position;
 	this->fov = 60.0f;
 	SetSpeed(3.0f);
 	SetDirection(direction);
+	currentCamera = this;
 }
 
 glm::mat4 Camera::GetViewMatrix() const

@@ -6,6 +6,8 @@
 class Camera // TODO: turn it into a Component
 {
 public:
+	static Camera* currentCamera;
+
 	Camera(const glm::vec3& position, const glm::vec3& direction);
 
 	void Move(const glm::vec3& moveVector);

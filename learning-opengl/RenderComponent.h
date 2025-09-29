@@ -9,11 +9,14 @@ class RenderComponent :
     public Component
 {
 public:
-    ~RenderComponent() override = default;
+    ~RenderComponent()
+    {
+        RenderingManager::RemoveRenderComponent(this);
+    }
     RenderComponent() : Component() 
     {
         model = nullptr;
-        material = nullptr;
+        material = Material::GetDefaultMaterial();
         RenderingManager::AddRenderComponent(this);
     };
     void SetModel(std::shared_ptr<Model> model);
