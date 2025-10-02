@@ -63,7 +63,7 @@ void RenderingManager::processModelNode(Model::Node* modelNode, const glm::mat4&
 		RenderCommand renderCommand;
 		renderCommand.material = material;
 		renderCommand.mesh = mesh.get();
-		renderCommand.shader = material->GetShader();
+		renderCommand.shader = material->GetShader().get();
 		renderCommand.transform = currentTransform;
 		renderCommand.sortKey = (uint64_t(renderCommand.shader->ID) << 32 | uint64_t(renderCommand.material->ID));
 		renderCommands.push_back(renderCommand);

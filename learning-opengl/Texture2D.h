@@ -5,7 +5,7 @@
 class Texture2D
 {
 public:
-	Texture2D(const char* imagePath, GLenum type);
+	Texture2D(const char* imagePath);
 	Texture2D(unsigned char* data, GLenum type, int width, int height);
 	static GLuint GenerateTexture(unsigned char* data, GLenum type, int width, int height);
 	static void InitWhiteFallbackTexture();

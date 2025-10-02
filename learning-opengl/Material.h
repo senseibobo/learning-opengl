@@ -26,7 +26,7 @@ public:
 
 	static std::shared_ptr<Material> GetDefaultMaterial();
 
-	Shader* GetShader();
+	std::shared_ptr<Shader> GetShader();
 	void Bind();
 
 	uint32_t ID;

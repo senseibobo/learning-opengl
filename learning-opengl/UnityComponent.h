@@ -17,8 +17,11 @@ public:
 	}
 	void Process(float delta) override;
 	void ProcessClick(const glm::vec3& position, const glm::vec3& direction);
+	void GetHit();
+
+	static int score;
 
 private:
-	float speed = 1.0f;
+	float speed = 10.0f;
 };
 

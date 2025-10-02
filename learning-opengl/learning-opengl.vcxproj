@@ -106,7 +106,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -132,10 +132,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="C:\libs\glad\src\glad.c" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="DirectionalLightComponent.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GodotComponent.cpp" />
+    <ClCompile Include="GUIManager.cpp" />
+    <ClCompile Include="GunComponent.cpp" />
+    <ClCompile Include="imgui.cpp" />
+    <ClCompile Include="imgui_draw.cpp" />
+    <ClCompile Include="imgui_tables.cpp" />
+    <ClCompile Include="imgui_widgets.cpp" />
     <ClCompile Include="LightComponent.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Material.cpp" />
@@ -144,6 +154,7 @@
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Node3D.cpp" />
+    <ClCompile Include="PickupComponent.cpp" />
     <ClCompile Include="PointLightComponent.cpp" />
     <ClCompile Include="RenderComponent.cpp" />
     <ClCompile Include="RenderingManager.cpp" />
@@ -156,9 +167,17 @@
     <ClCompile Include="UnitySpawnerComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="backends\imgui_impl_glfw.h" />
+    <ClInclude Include="backends\imgui_impl_opengl3.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="Components.h" />
     <ClInclude Include="DirectionalLightComponent.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="GodotComponent.h" />
+    <ClInclude Include="GUIManager.h" />
+    <ClInclude Include="GunComponent.h" />
+    <ClInclude Include="imgui.h" />
     <ClInclude Include="LightComponent.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
@@ -166,6 +185,7 @@
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Node3D.h" />
+    <ClInclude Include="PickupComponent.h" />
     <ClInclude Include="PointLightComponent.h" />
     <ClInclude Include="RenderComponent.h" />
     <ClInclude Include="RenderingManager.h" />

@@ -17,6 +17,11 @@
 #include "UnitySpawnerComponent.h"
 #include "UnityComponent.h"
 #include "assimp/Importer.hpp"
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
+#include "GUIManager.h"
+#include "Game.h"
 
 
 Camera* camera;
@@ -26,6 +31,8 @@ double deltaTime = 0.0001f;
 double oldMouseX;
 double oldMouseY;
 
+
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -34,6 +41,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void mouse_callback(GLFWwindow*, double mouseX, double mouseY)
 {
+	if (Game::over) return;
 	if (firstMouse)
 	{
 		oldMouseX = mouseX;
@@ -48,11 +56,12 @@ void mouse_callback(GLFWwindow*, double mouseX, double mouseY)
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
+	if (Game::over) return;
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
-		for (UnityComponent* unityComponent : UnityComponent::unitys)
+		if (GunComponent::gun)
 		{
-			unityComponent->ProcessClick(camera->GetPosition(), camera->GetForwardVector());
+			GunComponent::gun->Shoot();
 		}
 	}
 }
@@ -68,6 +77,7 @@ void processInput(GLFWwindow* window)
 	{
 		glfwSetWindowShouldClose(window, true);
 	}
+	if (Game::over) return;
 	if (camera != nullptr)
 	{
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -118,6 +128,13 @@ int main() {
 	glfwSetScrollCallback(window, scroll_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 330");
+
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cout << "Nije uspelo iniciranje gladovanja :(\n";
@@ -125,95 +142,25 @@ int main() {
 
 	glViewport(0, 0, 800, 600);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	Material::InitDefaultMaterial();
-	Texture2D::InitWhiteFallbackTexture();
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
 
 	const GLubyte* version = glGetString(GL_VERSION);
 	const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
 	std::cout << "VERSION: " << version << "\n";
 	std::cout << "GLSL VERSION: " << glslVersion << "\n";
 
-	glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, -10.0f);
+
+	glm::vec3 cameraPosition = glm::vec3(0.0f, 0.5f, -10.0f);
 	glm::vec3 cameraDirection = glm::normalize(glm::vec3(0.0f, 0.0f, 0.0f) - cameraPosition);
 	camera = new Camera(cameraPosition, cameraDirection);
 
+	Material::InitDefaultMaterial();
+	Texture2D::InitWhiteFallbackTexture();
 	RenderingManager::SetCamera(camera);
-	
-
-	/*std::shared_ptr<Texture2D> junoKilometarTexture = std::make_shared<Texture2D>("./texture.png", GL_RGBA);
-	std::shared_ptr<Texture2D> containerTexture = std::make_shared<Texture2D>("./container.jpg", GL_RGB);
-	junoKilometarTexture->SetWrap(GL_CLAMP_TO_EDGE);
-	containerTexture->SetWrap(GL_REPEAT);
-
-	std::shared_ptr<Shader> shader = std::make_shared<Shader>("./litVertex.glsl", "./litFragment.glsl");
-	std::shared_ptr<Material> material1 = std::make_shared<Material>();
-	std::shared_ptr<Material> material2 = std::make_shared<Material>();
-
-	material1->SetShader(shader);
-	material1->SetAlbedoMap(junoKilometarTexture);
-	material1->SetSpecularMap(containerTexture);
-	material1->SetRoughnessMap(containerTexture);
-	material1->SetDepthTestFunc(GL_ALWAYS);
-	material2->SetShader(shader);*/
-
-
-
-
-	Node3D* cube1 = new Node3D();
-	auto unitySpawnerComponent = std::make_unique<UnitySpawnerComponent>();
-	cube1->AddComponent(std::move(unitySpawnerComponent));
- 
-	//Node3D* cube2 = new Node3D();
-	//auto renderComponent2 = std::make_unique<RenderComponent>();
-	//renderComponent2->SetMaterial(material2);
-	//renderComponent2->SetModel(Model::Load("./model.glb"));
-	//cube2->AddComponent(std::move(renderComponent2));
-	//cube2->transform.Translate(glm::vec3(2.0f, 0.0f, 0.0f));
-
-	// Light
-
-	Node3D* light = new Node3D();
-	auto directionalLightComponent = std::make_unique<DirectionalLightComponent>();
-	light->transform.SetEuler(glm::vec3(1.5f, 1.0f, 0.0f));
-	light->AddComponent(std::move(directionalLightComponent));
-	Node3D* light2 = new Node3D();
-	auto directionalLightComponent2 = std::make_unique<DirectionalLightComponent>();
-	light2->transform.SetEuler(glm::vec3(4.5f, 4.0f, 0.0f));
-	light2->AddComponent(std::move(directionalLightComponent2));
-
-
-	//Node3D* spotLightCube = new Node3D();
-	//spotLightCube->transform.SetEuler(glm::vec3(1.51f, 0.5f, 0.0f));
-	//spotLightCube->transform.Translate(glm::vec3(1.0f, 2.0f, 1.0f));
-	//std::unique_ptr<SpotLightComponent> lightComponent = std::make_unique<SpotLightComponent>();
-	//lightComponent->SetColor(glm::vec3(1.0f, 0.8f, 1.0f));
-	//lightComponent->SetIntensity(1.0f);
-	//lightComponent->SetInnerAngle(0.5f);
-	//lightComponent->SetOuterAngle(0.7f);
-	//std::shared_ptr<Shader> lightShader = std::make_shared<Shader>("./defaultVertex.glsl", "./lightFragment.glsl");
-	//std::shared_ptr<Material> lightMaterial = std::make_shared<Material>();
-	//lightMaterial->SetShader(lightShader);
-	//lightMaterial->SetVec3("color", lightComponent->GetColor());
-	//spotLightCube->AddComponent(std::move(lightComponent));
-
-	//auto renderComponent = std::make_unique<RenderComponent>();
-	//renderComponent->SetMaterial(lightMaterial);
-	//renderComponent->SetModel(Model::Load("./model.glb"));
-
-	//spotLightCube->AddComponent(std::move(renderComponent));
-
-	//Node3D* directionalLightNode = new Node3D();
-	//directionalLightNode->transform.SetEuler(glm::vec3(0.3f, 0.2f, 0.0f));
-	//auto directionalLightComponent = std::make_unique<DirectionalLightComponent>();
-	//directionalLightComponent->SetColor(glm::vec3(1.0f, 1.0f, 0.0f));
-	//directionalLightComponent->SetIntensity(0.4f);
-	//directionalLightNode->AddComponent(std::move(directionalLightComponent));
-
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_STENCIL_TEST);
 	RenderingManager::Init();
-
+	GUIManager::Init();
+	Game::Init();
 
 	float fpsCap = 144.0f;
 	while (!glfwWindowShouldClose(window)) {
@@ -221,23 +168,16 @@ int main() {
 		deltaTime = glfwGetTime() - oldTime;
 		if (deltaTime < 1.0f / fpsCap) continue;
 		processInput(window);
+		Game::Process(deltaTime);
+
 
 		//spotLightCube->transform.SetPosition(glm::vec3(cos(glfwGetTime()*1.2f)*3.0f, sin(glfwGetTime()*1.5f)*3.0f, sin(glfwGetTime()*2.0f)*3.0f));
 		//spotLightCube->transform.LookAt(glm::vec3(0.0f, 0.0f, 0.0f));
-
 		glClearColor(0.1, 0.1, 0.1, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-		std::vector<Node*> tNodes = std::vector<Node*>(Node::nodes);
-
-		for (Node* node : tNodes)
-		{																																			
-			if(node)
-				node->Process(deltaTime);
-		}
-
 		RenderingManager::Render();
-		Node::FreeQueuedObjects();
+		GUIManager::Render();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

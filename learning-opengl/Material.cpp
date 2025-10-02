@@ -74,6 +74,7 @@ void Material::InitDefaultMaterial()
 	defaultMaterial = std::make_shared<Material>();
 	std::shared_ptr<Shader> shader = std::make_shared<Shader>("./litVertex.glsl", "./litFragment.glsl");
 	defaultMaterial->SetShader(shader);
+	defaultMaterial->SetSpecular(0.4);
 }
 
 std::shared_ptr<Material> Material::GetDefaultMaterial()
@@ -81,9 +82,9 @@ std::shared_ptr<Material> Material::GetDefaultMaterial()
 	return defaultMaterial;
 }
 
-Shader* Material::GetShader()
+std::shared_ptr<Shader> Material::GetShader()
 {
-	return shader.get();
+	return shader;
 }
 
 void Material::Bind()

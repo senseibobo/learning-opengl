@@ -7,7 +7,7 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& direction)
 {
 	this->position = position;
 	this->fov = 60.0f;
-	SetSpeed(3.0f);
+	SetSpeed(10.0f);
 	SetDirection(direction);
 	currentCamera = this;
 }
@@ -21,7 +21,7 @@ glm::mat4 Camera::GetViewMatrix() const
 
 glm::mat4 Camera::GetProjectionMatrix() const
 {
-	return glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.01f, 100.0f);;
+	return glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.01f, 1000.0f);;
 }
 
 void Camera::LookAt(const glm::vec3& targetPosition)
@@ -100,7 +100,11 @@ void Camera::recalculateDirection()
 
 void Camera::Move(const glm::vec3& moveVector)
 {
-	position += moveVector;
+	glm::vec3 move = moveVector;
+	float mag = glm::length(move);
+	move.y = 0.0;
+	move = glm::normalize(move)*mag;
+	position += move;
 }
 
 void Camera::Rotate(float angle, const glm::vec3& axis)
